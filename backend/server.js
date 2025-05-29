@@ -32,7 +32,7 @@ app.post('/api/scan', async (req, res) => {
         }
 
         // Pentest Tools API call
-        const response = await axios.post(`https://pentest-tools.com/api/v1/${scanType}`, {
+        const response = await axios.post(`https://pentest-tools.com/api/v2/${scanType}`, {
             target: target,
             ...options
         }, {
