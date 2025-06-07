@@ -1,71 +1,51 @@
 # Deployment Instructions for Cobytes Security Platform
 
-## Database Configuration
+## Manual Environment Variable Setup Required
 
-Your DigitalOcean Managed PostgreSQL database is ready. To connect your app:
+The DigitalOcean MCP API does not support updating environment variables programmatically. You must manually add them through the web interface.
 
-### 1. Go to DigitalOcean App Platform Dashboard
-https://cloud.digitalocean.com/apps/93a8fcec-94b3-4c24-9c7f-3b23c6b37b5c
+### Steps to Complete Deployment:
 
-### 2. Update Environment Variables
+1. **Go to your DigitalOcean Dashboard:**
+   https://cloud.digitalocean.com/apps/93a8fcec-94b3-4c24-9c7f-3b23c6b37b5c
 
-Click on **Settings** → **api** component → **Environment Variables** and add/update:
+2. **Navigate to Settings → api → Environment Variables**
 
-```
-DATABASE_URL = postgresql://doadmin:[YOUR_PASSWORD]@private-db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com:25060/defaultdb?sslmode=require
-```
+3. **Add/Update these environment variables:**
+   ```
+   DATABASE_URL = postgresql://doadmin:[YOUR_PASSWORD]@private-db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com:25060/defaultdb?sslmode=require
+   JWT_SECRET = [GENERATE_A_SECURE_SECRET]
+   JWT_REFRESH_SECRET = [GENERATE_A_DIFFERENT_SECURE_SECRET]
+   NODE_ENV = production
+   PORT = 3001
+   PENTEST_TOOLS_API_KEY = [YOUR_API_KEY]
+   PENTEST_TOOLS_API_URL = https://app.pentest-tools.com/api/v2
+   CORS_ORIGIN = https://securityscan.cobytes.com
+   ```
 
-**Remove these if they exist:**
-- SKIP_DB
+4. **Remove any 'SKIP_DB' variable if it exists**
 
-**Ensure these are set:**
-- NODE_ENV = production
-- PORT = 3001
-- JWT_SECRET = cobytes-jwt-secret-prod-2024
-- JWT_REFRESH_SECRET = cobytes-jwt-refresh-secret-prod-2024
-- PENTEST_TOOLS_API_KEY = 43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7
-- PENTEST_TOOLS_API_URL = https://app.pentest-tools.com/api/v2
-- CORS_ORIGIN = https://securityscan.cobytes.com
+5. **Click 'Save'**
 
-### 3. Deploy
-After saving the environment variables, click **Deploy** to trigger a new deployment.
+6. **Click 'Deploy' to trigger a new deployment**
 
-## Database Connection Details
+## What Will Happen:
 
-- **Username:** doadmin
-- **Password:** [Use your actual password]
-- **Host (Private Network):** private-db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com
-- **Host (Public):** db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com
-- **Port:** 25060
-- **Database:** defaultdb
-- **SSL Mode:** require
+- The app will pull the latest code from GitHub
+- The backend will build with TypeScript path resolution fixed
+- The SSL certificate for database connection is embedded in the Docker image
+- TypeORM will connect to your managed PostgreSQL database
+- Tables will be auto-created on first run
+- The app will be available at https://securityscan.cobytes.com
 
-**Note:** Using the private network host (private-db-...) is recommended for better security and performance when the app is in the same region.
+## Database Connection Details:
 
-## Restoring Database Backup
+- Host (public): db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com
+- Host (private): private-db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com
+- Port: 25060
+- Database: defaultdb
+- SSL: Required (certificate embedded in Docker image)
 
-If you have a database backup to restore:
+## Monitor Deployment:
 
-```bash
-PGPASSWORD=[YOUR_PASSWORD] pg_restore -U doadmin -h db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com -p 25060 -d defaultdb your_backup.sql
-```
-
-## Architecture
-
-- **Frontend:** React app served as static files
-- **Backend:** Node.js API with Express
-- **Database:** DigitalOcean Managed PostgreSQL
-- **Hosting:** DigitalOcean App Platform
-- **Domain:** securityscan.cobytes.com with SSL
-
-## Monitoring
-
-- Check deployment status: https://cloud.digitalocean.com/apps/93a8fcec-94b3-4c24-9c7f-3b23c6b37b5c
-- View logs: Click on the component → Runtime Logs
-- Database metrics: DigitalOcean Databases dashboard
-
-## Costs
-
-- App Platform: ~$5-10/month
-- Managed Database: $15/month
-- **Total:** ~$20-25/month
+Check the Activity tab in DigitalOcean dashboard to monitor deployment progress and view logs.
