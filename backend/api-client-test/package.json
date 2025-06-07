@@ -1,0 +1,13 @@
+{
+  "name": "api-client-test",
+  "version": "1.0.0",
+  "description": "Test client for Cobytes and PentestTools APIs",
+  "main": "test-api-client.js",
+  "scripts": {
+    "test": "node test-api-client.js",
+    "test-cobytes": "node test-cobytes-advanced.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

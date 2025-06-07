@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Proxy Test with API Key</title>
+</head>
+<body>
+    <h1>Testing CORS Proxy with API Key: a798811f</h1>
+    <button onclick="testCors()">Test CORS Proxy</button>
+    <pre id="result"></pre>
+    
+    <script>
+        async function testCors() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Testing CORS proxy with API key...';
+            
+            const apiKey = '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
+            const targetUrl = 'https://app.pentest-tools.com/api/v2/targets';
+            const proxyUrl = `https://corsproxy.io/?key=a798811f&url=${encodeURIComponent(targetUrl)}`;
+            
+            console.log('Proxy URL:', proxyUrl);
+            
+            try {
+                const response = await fetch(proxyUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                resultEl.textContent = `Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`;
+                console.log('Response:', data);
+            } catch (error) {
+                resultEl.textContent = 'Error: ' + error.message;
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

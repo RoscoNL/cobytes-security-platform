@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .scanner-test {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .scanner-test h3 {
+            margin-top: 0;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        .status.pending { background: #f0f0f0; color: #666; }
+        .status.testing { background: #fff3cd; color: #856404; }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e9ecef;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>PentestTools Scanner API Test</h1>
+    
+    <div>
+        <button onclick="testAllScanners()">Test All Scanners</button>
+        <button onclick="testWordPressScanner()">Test WordPress Scanner Only</button>
+    </div>
+
+    <div id="results" style="margin-top: 20px;"></div>
+    <div id="summary" class="summary" style="display: none;"></div>
+
+    <script>
+        // Configuration
+        const API_KEY = '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
+        const PROXY_URL = 'https://thingproxy.freeboard.io/fetch/';
+        const API_URL = `${PROXY_URL}https://app.pentest-tools.com/api/v2`;
+
+        const headers = {
+            'Authorization': `Bearer ${API_KEY}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        };
+
+        // Scanner definitions
+        const SCANNERS = [
+            { id: 270, name: 'WordPress Scanner', target: 'https://www.cobytes.com', priority: 1 },
+            { id: 20, name: 'Subdomain Finder', target: 'cobytes.com', priority: 2 },
+            { id: 170, name: 'Website Scanner', target: 'https://www.cobytes.com', priority: 3 },
+            { id: 450, name: 'SSL Scanner', target: 'cobytes.com', priority: 4 },
+            { id: 310, name: 'Website Recon', target: 'https://www.cobytes.com', priority: 5 },
+            { id: 90, name: 'URL Fuzzer', target: 'https://www.cobytes.com', priority: 6 },
+            { id: 500, name: 'WAF Detector', target: 'https://www.cobytes.com', priority: 7 },
+            { id: 70, name: 'TCP Port Scanner', target: 'cobytes.com', priority: 8 },
+            { id: 160, name: 'Virtual Host Finder', target: 'cobytes.com', priority: 9 }
+        ];
+
+        async function testScanner(scanner) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'scanner-test';
+            resultDiv.innerHTML = `
+                <h3>${scanner.name} (ID: ${scanner.id})</h3>
+                <div class="status testing">Testing...</div>
+                <div class="result" style="display: none;"></div>
+            `;
+            document.getElementById('results').appendChild(resultDiv);
+
+            const statusEl = resultDiv.querySelector('.status');
+            const resultEl = resultDiv.querySelector('.result');
+
+            try {
+                // Step 1: Try to create/get target
+                let targetId;
+                try {
+                    const targetsResponse = await fetch(`${API_URL}/targets`, {
+                        method: 'GET',
+                        headers
+                    });
+                    
+                    if (targetsResponse.ok) {
+                        const targetsData = await targetsResponse.json();
+                        const existingTarget = targetsData.data?.find(t => t.name === scanner.target);
+                        
+                        if (existingTarget) {
+                            targetId = existingTarget.id;
+                            console.log(`Found existing target: ${targetId}`);
+                        } else {
+                            // Create new target
+                            const createResponse = await fetch(`${API_URL}/targets`, {
+                                method: 'POST',
+                                headers,
+                                body: JSON.stringify({ name: scanner.target })
+                            });
+                            
+                            if (createResponse.ok) {
+                                const createData = await createResponse.json();
+                                targetId = createData.data?.id;
+                                console.log(`Created new target: ${targetId}`);
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.log('Target API failed, will use target_name parameter');
+                }
+
+                // Step 2: Start scan
+                const scanOptions = {
+                    tool_id: scanner.id,
+                    target_name: scanner.target,
+                    tool_params: {}
+                };
+
+                if (targetId) {
+                    scanOptions.target_id = targetId;
+                }
+
+                console.log('Starting scan with options:', scanOptions);
+
+                const scanResponse = await fetch(`${API_URL}/scans`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(scanOptions)
+                });
+
+                const scanData = await scanResponse.json();
+                
+                if (!scanResponse.ok) {
+                    throw new Error(`Scan failed: ${scanResponse.status} - ${JSON.stringify(scanData)}`);
+                }
+
+                const scanId = scanData.data?.created_id || scanData.data?.id;
+                
+                if (!scanId) {
+                    throw new Error('No scan ID returned');
+                }
+
+                statusEl.textContent = 'Scan started';
+                statusEl.className = 'status success';
+                resultEl.style.display = 'block';
+                resultEl.innerHTML = `
+                    <strong>Success!</strong><br>
+                    Scan ID: ${scanId}<br>
+                    Target: ${scanner.target}<br>
+                    Status: Scan initiated successfully
+                `;
+
+                return { scanner: scanner.name, status: 'success', scanId };
+
+            } catch (error) {
+                statusEl.textContent = 'Error';
+                statusEl.className = 'status error';
+                resultEl.style.display = 'block';
+                resultEl.innerHTML = `<strong>Error:</strong> ${error.message}`;
+                
+                return { scanner: scanner.name, status: 'error', error: error.message };
+            }
+        }
+
+        async function testAllScanners() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            
+            const results = [];
+            
+            // Test scanners sequentially to avoid rate limiting
+            for (const scanner of SCANNERS) {
+                const result = await testScanner(scanner);
+                results.push(result);
+                
+                // Wait a bit between tests
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            // Show summary
+            const successCount = results.filter(r => r.status === 'success').length;
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.style.display = 'block';
+            summaryDiv.innerHTML = `
+                <h2>Test Summary</h2>
+                <p><strong>Success Rate:</strong> ${successCount}/${results.length} scanners</p>
+                <ul>
+                    ${results.map(r => `
+                        <li>
+                            ${r.status === 'success' ? '✅' : '❌'} 
+                            ${r.scanner}: ${r.status}
+                            ${r.error ? ` - ${r.error}` : ''}
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+
+        async function testWordPressScanner() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            
+            const wpScanner = SCANNERS.find(s => s.id === 270);
+            await testScanner(wpScanner);
+        }
+    </script>
+</body>
+</html>

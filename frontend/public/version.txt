@@ -1,0 +1,9 @@
+Version: 2.0.0
+Date: 2025-01-07
+Features: Cobytes Design System
+- Orange/Navy theme (#FF6B35, #3D3B5C)
+- Security status indicators
+- Scan progress visualization
+- Reports with export
+- Mobile responsive design
+- 40+ PentestTools scanners

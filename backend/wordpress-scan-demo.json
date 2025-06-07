@@ -1,0 +1,123 @@
+{
+  "scan_summary": {
+    "id": 3,
+    "target": "https://www.cobytes.com",
+    "type": "wordpress",
+    "status": "completed",
+    "progress": "100.00",
+    "started_at": "2025-06-06T13:38:45.438Z",
+    "completed_at": "2025-06-06T13:45:12.648Z"
+  },
+  "results": [
+    {
+      "type": "wordpress_version",
+      "title": "WordPress Version Detection",
+      "severity": "info",
+      "description": "WordPress version 6.4.2 detected",
+      "details": {
+        "version": "6.4.2",
+        "latest_version": "6.4.3",
+        "outdated": true
+      },
+      "recommendation": "Update WordPress to the latest version (6.4.3) to ensure you have the latest security patches."
+    },
+    {
+      "type": "theme_detection",
+      "title": "Theme Information",
+      "severity": "info",
+      "description": "Active theme: Twenty Twenty-Three",
+      "details": {
+        "theme_name": "Twenty Twenty-Three",
+        "version": "1.3",
+        "author": "WordPress.org"
+      }
+    },
+    {
+      "type": "plugin_enumeration",
+      "title": "Detected Plugins",
+      "severity": "medium",
+      "description": "Found 5 active plugins",
+      "details": {
+        "plugins": [
+          {
+            "name": "Contact Form 7",
+            "version": "5.8.4",
+            "slug": "contact-form-7",
+            "vulnerabilities": []
+          },
+          {
+            "name": "Yoast SEO",
+            "version": "21.7",
+            "slug": "wordpress-seo",
+            "vulnerabilities": []
+          },
+          {
+            "name": "WooCommerce",
+            "version": "8.4.0",
+            "slug": "woocommerce",
+            "vulnerabilities": [
+              {
+                "title": "WooCommerce < 8.5.1 - Customer Account Takeover",
+                "fixed_in": "8.5.1",
+                "cve": "CVE-2024-12345"
+              }
+            ]
+          }
+        ]
+      },
+      "recommendation": "Keep all plugins updated and remove any unused plugins to reduce attack surface."
+    },
+    {
+      "type": "user_enumeration",
+      "title": "User Enumeration",
+      "severity": "low",
+      "description": "Found 3 users through author enumeration",
+      "details": {
+        "users": [
+          {
+            "id": 1,
+            "username": "admin",
+            "display_name": "Site Administrator"
+          },
+          {
+            "id": 2,
+            "username": "editor",
+            "display_name": "Content Editor"
+          }
+        ]
+      },
+      "recommendation": "Consider using security plugins to prevent user enumeration and enforce strong passwords for all users."
+    },
+    {
+      "type": "security_headers",
+      "title": "Missing Security Headers",
+      "severity": "medium",
+      "description": "Several important security headers are missing",
+      "details": {
+        "missing_headers": [
+          "X-Frame-Options",
+          "X-Content-Type-Options",
+          "Content-Security-Policy"
+        ]
+      },
+      "recommendation": "Configure your web server to include security headers to prevent clickjacking and other attacks."
+    },
+    {
+      "type": "xmlrpc_enabled",
+      "title": "XML-RPC Enabled",
+      "severity": "medium",
+      "description": "XML-RPC is enabled and can be used for brute force attacks",
+      "affected_component": "/xmlrpc.php",
+      "recommendation": "Disable XML-RPC if not needed, or use a security plugin to limit access."
+    }
+  ],
+  "statistics": {
+    "total_findings": 6,
+    "critical": 0,
+    "high": 0,
+    "medium": 3,
+    "low": 1,
+    "info": 2,
+    "scan_duration": "6 minutes 27 seconds"
+  }
+}

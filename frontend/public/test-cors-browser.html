@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Proxy Browser Test</title>
+</head>
+<body>
+    <h1>CORS Proxy Browser Test</h1>
+    <button onclick="testFormats()">Test All Formats</button>
+    <pre id="result"></pre>
+    
+    <script>
+        async function testFormats() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Testing CORS proxy formats...\n';
+            
+            const corsProxyKey = 'a798811f';
+            const targetUrl = 'https://app.pentest-tools.com/api/v2/targets';
+            const pentestApiKey = '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
+            
+            // Test different formats
+            const tests = [
+                {
+                    name: 'thingproxy.freeboard.io (WORKING)',
+                    url: `https://thingproxy.freeboard.io/fetch/${targetUrl}`,
+                    headers: {
+                        'Authorization': `Bearer ${pentestApiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                },
+                {
+                    name: 'Direct API call (will fail in browser)',
+                    url: targetUrl,
+                    headers: {
+                        'Authorization': `Bearer ${pentestApiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            ];
+            
+            for (const test of tests) {
+                resultEl.textContent += `\n\nTesting: ${test.name}\nURL: ${test.url}\n`;
+                
+                try {
+                    const response = await fetch(test.url, {
+                        method: 'GET',
+                        headers: test.headers
+                    });
+                    
+                    const text = await response.text();
+                    resultEl.textContent += `Status: ${response.status}\n`;
+                    
+                    if (response.ok) {
+                        resultEl.textContent += `Success! Response: ${text.substring(0, 200)}...\n`;
+                    } else {
+                        resultEl.textContent += `Failed: ${text.substring(0, 100)}...\n`;
+                    }
+                } catch (error) {
+                    resultEl.textContent += `Error: ${error.message}\n`;
+                }
+            }
+        }
+        
+        // Auto-run on load
+        window.onload = () => {
+            console.log('Page loaded. Click button to test CORS proxies.');
+        };
+    </script>
+</body>
+</html>

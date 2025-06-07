@@ -1,0 +1,30 @@
+{
+  "name": "cobytes-security-platform",
+  "version": "0.1.0",
+  "description": "White-label security scanning platform voor de Nederlandse markt",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev:backend",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "test": "npm run test:backend",
+    "test:backend": "cd backend && npm test",
+    "commit": "git add . && git commit -m 'Auto-update' && git push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/[username]/cobytes-platform.git"
+  },
+  "keywords": [
+    "security",
+    "scanning",
+    "pentest",
+    "vulnerability",
+    "api"
+  ],
+  "author": "Jeroen van Rossum",
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Proxy Test</title>
+</head>
+<body>
+    <h1>Testing CORS Proxy</h1>
+    <button onclick="testCors()">Test CORS Proxy</button>
+    <pre id="result"></pre>
+    
+    <script>
+        async function testCors() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('https://corsproxy.io/?https://app.pentest-tools.com/api/v2/targets', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer 43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                resultEl.textContent = JSON.stringify(data, null, 2);
+                console.log('Response:', data);
+            } catch (error) {
+                resultEl.textContent = 'Error: ' + error.message;
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

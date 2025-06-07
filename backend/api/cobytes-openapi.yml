@@ -1,0 +1,1253 @@
+openapi: 3.0.3
+info:
+  title: Cobytes Security Platform API
+  description: |
+    The Cobytes Security Platform API provides comprehensive security scanning and reporting capabilities.
+    
+    ## Authentication
+    All endpoints (except health and API info) require JWT authentication.
+    Use the `/api/auth/login` endpoint to obtain a token.
+    
+    ## Base URL
+    - Development: `http://localhost:3001`
+    - Production: `https://api.cobytes.com`
+  version: 1.0.0
+  contact:
+    name: Cobytes API Support
+    email: api-support@cobytes.com
+    url: https://docs.cobytes.com
+  license:
+    name: Proprietary
+    url: https://cobytes.com/license
+
+servers:
+  - url: http://localhost:3001
+    description: Development server
+  - url: https://api.cobytes.com
+    description: Production server
+
+tags:
+  - name: Health
+    description: Health check and API information
+  - name: Authentication
+    description: User authentication and token management
+  - name: Scans
+    description: Security scan operations
+  - name: Reports
+    description: Report generation and management
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health Check
+      description: Check if the API is running and healthy
+      operationId: getHealth
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api:
+    get:
+      tags:
+        - Health
+      summary: API Information
+      description: Get general information about the API
+      operationId: getApiInfo
+      responses:
+        '200':
+          description: API information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiInfoResponse'
+
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login
+      description: Authenticate a user and receive a JWT token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register
+      description: Register a new user account
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/auth/verify:
+    get:
+      tags:
+        - Authentication
+      summary: Verify Token
+      description: Verify the validity of a JWT token
+      operationId: verifyToken
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh Token
+      description: Refresh an existing JWT token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout
+      description: Logout the current user
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+
+  /api/scans:
+    get:
+      tags:
+        - Scans
+      summary: Get All Scans
+      description: Get a list of all scans for the authenticated user
+      operationId: getAllScans
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter by scan status
+          schema:
+            type: string
+            enum: [pending, running, completed, failed]
+        - name: limit
+          in: query
+          description: Number of results per page
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          description: Pagination offset
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: List of scans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScansListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Scans
+      summary: Create New Scan
+      description: Create and start a new security scan
+      operationId: createScan
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScanRequest'
+      responses:
+        '201':
+          description: Scan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/scans/types/available:
+    get:
+      tags:
+        - Scans
+      summary: Get Available Scan Types
+      description: Get a list of all available scan types
+      operationId: getScanTypes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of scan types
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanTypesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/scans/{scanId}:
+    get:
+      tags:
+        - Scans
+      summary: Get Scan Details
+      description: Get detailed information about a specific scan
+      operationId: getScanById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scanId
+          in: path
+          required: true
+          description: Scan ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanDetailsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Scans
+      summary: Delete Scan
+      description: Delete a scan and all associated data
+      operationId: deleteScan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scanId
+          in: path
+          required: true
+          description: Scan ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scan deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/scans/{scanId}/status:
+    patch:
+      tags:
+        - Scans
+      summary: Update Scan Status
+      description: Update the status of a scan (admin only)
+      operationId: updateScanStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scanId
+          in: path
+          required: true
+          description: Scan ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/reports:
+    get:
+      tags:
+        - Reports
+      summary: Get All Reports
+      description: Get a list of all generated reports
+      operationId: getAllReports
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/reports/generate:
+    post:
+      tags:
+        - Reports
+      summary: Generate Report
+      description: Generate a new report from one or more scans
+      operationId: generateReport
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateReportRequest'
+      responses:
+        '202':
+          description: Report generation started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/reports/templates/available:
+    get:
+      tags:
+        - Reports
+      summary: Get Available Templates
+      description: Get a list of available report templates
+      operationId: getReportTemplates
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/reports/{reportId}:
+    get:
+      tags:
+        - Reports
+      summary: Get Report Details
+      description: Get detailed information about a specific report
+      operationId: getReportById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          description: Report ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Report details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportDetailsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Reports
+      summary: Delete Report
+      description: Delete a report
+      operationId: deleteReport
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          description: Report ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Report deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/reports/{reportId}/download:
+    get:
+      tags:
+        - Reports
+      summary: Download Report
+      description: Download a generated report
+      operationId: downloadReport
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          description: Report ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Report content
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportDownloadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/reports/stats/overview:
+    get:
+      tags:
+        - Reports
+      summary: Get Report Statistics
+      description: Get statistics about all reports
+      operationId: getReportStats
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Report statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportStatsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: number
+          example: 59.07146575
+        environment:
+          type: string
+          example: development
+        version:
+          type: string
+          example: 0.1.0
+
+    ApiInfoResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Cobytes Security Platform API
+        version:
+          type: string
+          example: 1.0.0
+        documentation:
+          type: string
+          example: /api/docs
+        endpoints:
+          type: object
+          properties:
+            health:
+              type: string
+              example: /health
+            auth:
+              type: string
+              example: /api/auth
+            users:
+              type: string
+              example: /api/users
+            scans:
+              type: string
+              example: /api/scans
+            reports:
+              type: string
+              example: /api/reports
+            organizations:
+              type: string
+              example: /api/organizations
+            admin:
+              type: string
+              example: /api/admin
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@cobytes.com
+        password:
+          type: string
+          format: password
+          example: admin123
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - name
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: securePassword123
+        name:
+          type: string
+          example: John Doe
+        organization:
+          type: string
+          example: Example Corp
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: user_1
+        email:
+          type: string
+          format: email
+          example: admin@cobytes.com
+        role:
+          type: string
+          enum: [user, admin]
+          example: admin
+        name:
+          type: string
+          example: Admin User
+        organization:
+          type: string
+          example: Cobytes Inc
+        createdAt:
+          type: string
+          format: date-time
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            token:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIs...
+            expiresIn:
+              type: integer
+              example: 86400
+
+    VerifyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            token:
+              type: object
+              properties:
+                valid:
+                  type: boolean
+                  example: true
+                expiresAt:
+                  type: string
+                  format: date-time
+
+    RefreshRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIs...
+
+    RefreshResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIs...
+            expiresIn:
+              type: integer
+              example: 86400
+
+    LogoutResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Logged out successfully
+
+    CreateScanRequest:
+      type: object
+      required:
+        - scanType
+        - targets
+      properties:
+        scanType:
+          type: string
+          enum: [web_vulnerability, network_scan, ssl_tls, dns_security, malware_analysis]
+          example: web_vulnerability
+        targets:
+          type: array
+          items:
+            type: string
+          example: [https://example.com, https://test.example.com]
+        configuration:
+          type: object
+          properties:
+            depth:
+              type: integer
+              example: 3
+            threads:
+              type: integer
+              example: 10
+            followRedirects:
+              type: boolean
+              example: true
+            userAgent:
+              type: string
+              example: Cobytes Security Scanner
+        scheduledAt:
+          type: string
+          format: date-time
+
+    Scan:
+      type: object
+      properties:
+        scanId:
+          type: string
+          example: scan_1748799588916_dw04msszk
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+          example: pending
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ScanResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Scan'
+
+    ScansListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scan'
+        count:
+          type: integer
+          example: 1
+
+    ScanType:
+      type: object
+      properties:
+        id:
+          type: string
+          example: web_vulnerability
+        name:
+          type: string
+          example: Web Vulnerability Scan
+        description:
+          type: string
+          example: Comprehensive web application security scan
+        tools:
+          type: array
+          items:
+            type: string
+          example: [OWASP ZAP, Burp Suite, Nikto]
+
+    ScanTypesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScanType'
+
+    Vulnerability:
+      type: object
+      properties:
+        severity:
+          type: string
+          enum: [critical, high, medium, low, info]
+          example: high
+        title:
+          type: string
+          example: SQL Injection vulnerability
+        description:
+          type: string
+          example: Potential SQL injection in login form
+        cve:
+          type: string
+          example: CVE-2024-1234
+        cwe:
+          type: string
+          example: CWE-89
+        affectedAssets:
+          type: array
+          items:
+            type: string
+          example: [192.168.1.100, https://example.com/login]
+        recommendation:
+          type: string
+          example: Use parameterized queries
+
+    ScanResults:
+      type: object
+      properties:
+        vulnerabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vulnerability'
+        summary:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 2
+            high:
+              type: integer
+              example: 1
+            medium:
+              type: integer
+              example: 1
+            low:
+              type: integer
+              example: 0
+
+    ScanDetailsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Scan'
+            - type: object
+              properties:
+                results:
+                  $ref: '#/components/schemas/ScanResults'
+
+    UpdateStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+          example: failed
+
+    GenerateReportRequest:
+      type: object
+      required:
+        - scanIds
+      properties:
+        scanIds:
+          type: array
+          items:
+            type: string
+          example: [scan_1748799588916_dw04msszk]
+        format:
+          type: string
+          enum: [pdf, html, json, csv]
+          default: pdf
+          example: pdf
+        includeDetails:
+          type: boolean
+          default: true
+          example: true
+        template:
+          type: string
+          example: executive_summary
+
+    Report:
+      type: object
+      properties:
+        reportId:
+          type: string
+          example: report_1748799588923_9rehl4b0k
+        name:
+          type: string
+          example: Security Report 2025-06-01
+        scanIds:
+          type: array
+          items:
+            type: string
+        format:
+          type: string
+          enum: [pdf, html, json, csv]
+          example: pdf
+        status:
+          type: string
+          enum: [generating, completed, failed]
+          example: generating
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        size:
+          type: integer
+          example: 245760
+        downloadUrl:
+          type: string
+          nullable: true
+          example: /api/reports/report_1748799588923_9rehl4b0k/download
+
+    ReportResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Report'
+        message:
+          type: string
+          example: Report generation started
+
+    ReportsListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Report'
+        count:
+          type: integer
+          example: 1
+
+    Template:
+      type: object
+      properties:
+        id:
+          type: string
+          example: executive_summary
+        name:
+          type: string
+          example: Executive Summary
+        description:
+          type: string
+          example: High-level overview for executives
+        formats:
+          type: array
+          items:
+            type: string
+            enum: [pdf, html, json, csv]
+          example: [pdf, html]
+
+    TemplatesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Template'
+
+    ReportDetailsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Report'
+
+    ReportContent:
+      type: object
+      properties:
+        summary:
+          type: object
+          properties:
+            totalVulnerabilities:
+              type: integer
+              example: 15
+            criticalCount:
+              type: integer
+              example: 2
+            highCount:
+              type: integer
+              example: 5
+            mediumCount:
+              type: integer
+              example: 6
+            lowCount:
+              type: integer
+              example: 2
+            scanDate:
+              type: string
+              format: date-time
+            targetCount:
+              type: integer
+              example: 1
+        vulnerabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vulnerability'
+        recommendations:
+          type: array
+          items:
+            type: string
+
+    ReportDownloadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            reportId:
+              type: string
+              example: report_1748799588923_9rehl4b0k
+            name:
+              type: string
+              example: Security Report 2025-06-01
+            format:
+              type: string
+              example: pdf
+            content:
+              $ref: '#/components/schemas/ReportContent'
+            generatedAt:
+              type: string
+              format: date-time
+
+    ReportStatsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            totalReports:
+              type: integer
+              example: 1
+            reportsByFormat:
+              type: object
+              properties:
+                pdf:
+                  type: integer
+                  example: 1
+                html:
+                  type: integer
+                  example: 0
+                json:
+                  type: integer
+                  example: 0
+                csv:
+                  type: integer
+                  example: 0
+            reportsByStatus:
+              type: object
+              properties:
+                generating:
+                  type: integer
+                  example: 0
+                completed:
+                  type: integer
+                  example: 1
+                failed:
+                  type: integer
+                  example: 0
+            averageGenerationTime:
+              type: number
+              example: 3.2
+            totalStorageUsed:
+              type: integer
+              example: 245760
+
+    DeleteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Resource deleted successfully
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: Error message
+        code:
+          type: string
+          example: ERROR_CODE
+        details:
+          type: object
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Validation failed
+            code: VALIDATION_ERROR
+            details:
+              field: Error details
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Invalid or missing authentication
+            code: UNAUTHORIZED
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Insufficient permissions
+            code: FORBIDDEN
+
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Resource not found
+            code: NOT_FOUND
+
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Resource already exists
+            code: CONFLICT
+
+    TooManyRequests:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Rate limit exceeded
+            code: RATE_LIMIT_EXCEEDED
+          headers:
+            X-RateLimit-Limit:
+              schema:
+                type: integer
+              description: Request limit per minute
+            X-RateLimit-Remaining:
+              schema:
+                type: integer
+              description: Remaining requests
+            X-RateLimit-Reset:
+              schema:
+                type: integer
+              description: Reset timestamp
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Internal server error
+            code: INTERNAL_ERROR

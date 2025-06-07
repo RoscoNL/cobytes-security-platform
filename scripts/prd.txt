@@ -1,0 +1,117 @@
+COBYTES SECURITY PLATFORM - PRODUCT REQUIREMENTS DOCUMENT
+
+1. PROJECT OVERVIEW
+Create a white-label security scanning platform for the Dutch market, powered by Pentest-tools.com API, with HostFact integration for invoicing.
+
+2. TARGET USERS
+- Dutch SMB companies needing security scans
+- Managed Service Providers (MSPs)
+- IT consultants
+- Web development agencies
+
+3. CORE FEATURES
+
+3.1 BACKEND API IMPLEMENTATION
+- Express.js server with TypeScript
+- RESTful API endpoints for all scan types
+- JWT authentication system
+- Rate limiting and security middleware
+- Error handling and logging
+
+3.2 DATABASE DESIGN
+- PostgreSQL database
+- User management tables
+- Scan history and results storage
+- Billing and invoice tracking
+- Report templates storage
+
+3.3 PENTEST-TOOLS INTEGRATION
+- API client wrapper for all 23 endpoints
+- Scan job queue management
+- Webhook handlers for scan results
+- Result processing and storage
+- Error handling and retries
+
+3.4 SCAN MANAGEMENT
+- Create new scans via API
+- Track scan progress
+- Store and retrieve results
+- Generate reports in multiple formats
+- Bundle management
+
+3.5 REPORT GENERATION
+- Technical vulnerability reports
+- Executive summaries (€10 add-on)
+- Remediation plans (€15 add-on)
+- Export to PDF, HTML, JSON, CSV, DOCX
+- Dutch language support
+
+3.6 BILLING & INVOICING
+- HostFact API integration
+- Automatic invoice generation
+- Bundle pricing logic
+- Subscription management
+- Payment tracking
+
+3.7 USER AUTHENTICATION
+- JWT-based authentication
+- User registration and login
+- Password reset functionality
+- Role-based access control
+- API key management
+
+4. TECHNICAL SPECIFICATIONS
+
+4.1 BACKEND STACK
+- Node.js with Express/Fastify
+- TypeScript for type safety
+- PostgreSQL for data storage
+- Redis for caching and sessions
+- Bull for job queue management
+
+4.2 SECURITY REQUIREMENTS
+- HTTPS everywhere
+- Input validation (Joi/Zod)
+- SQL injection prevention
+- XSS protection
+- CORS configuration
+- Rate limiting
+
+4.3 API ENDPOINTS
+- POST /api/auth/register
+- POST /api/auth/login
+- GET /api/scans
+- POST /api/scans/create
+- GET /api/scans/:id
+- GET /api/scans/:id/report
+- POST /api/billing/invoice
+- GET /api/user/profile
+
+5. PRICING STRUCTURE
+- Basic Scans: €10
+- Vulnerability Scans: €20-25
+- API/Cloud Scans: €50
+- CMS Scans: €35
+- Enterprise Scans: €75
+- Report Add-ons: €10-15
+
+6. INTEGRATION REQUIREMENTS
+- Pentest-tools.com API (key: sk-FBjMQcPq8jJ97Eu5nVgLhA)
+- HostFact API for invoicing
+- Email service for notifications
+- Webhook endpoints for async results
+
+7. DEPLOYMENT REQUIREMENTS
+- Docker containerization
+- Environment configuration
+- Database migrations
+- CI/CD pipeline setup
+- Monitoring and logging
+
+8. PHASE 2 DELIVERABLES (CURRENT)
+- Working Express server
+- Database schema implementation
+- Pentest-tools API client
+- Basic authentication
+- Core scan endpoints
+- Test suite setup
