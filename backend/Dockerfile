@@ -47,6 +47,9 @@ COPY --from=builder /app/dist ./dist
 # Copy source for path resolution (needed for tsconfig-paths)
 COPY --from=builder /app/src ./src
 
+# Copy CA certificate for database SSL connection
+COPY ca-certificate.crt ./ca-certificate.crt
+
 # Create necessary directories
 RUN mkdir -p uploads logs && \
     chown -R nodejs:nodejs /app
