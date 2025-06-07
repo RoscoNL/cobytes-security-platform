@@ -31,10 +31,16 @@ spec:
           value: "https://app.pentest-tools.com/api/v2"
           scope: RUN_TIME
         - key: CORS_ORIGIN
-          value: "https://securityscan.cobytes.com,http://localhost:3000"
+          value: "https://securityscan.cobytes.com"
           scope: RUN_TIME
         - key: SKIP_DB
           value: "true"
+          scope: RUN_TIME
+        - key: JWT_SECRET
+          value: "cobytes-jwt-secret-prod-2024"
+          scope: RUN_TIME
+        - key: JWT_REFRESH_SECRET
+          value: "cobytes-jwt-refresh-secret-prod-2024"
           scope: RUN_TIME
     
   static_sites:
