@@ -50,7 +50,7 @@ const getDatabaseConfig = () => {
 
 export const AppDataSource = new DataSource({
   ...getDatabaseConfig(),
-  synchronize: process.env.NODE_ENV === 'development', // Auto-create tables in dev
+  synchronize: true, // Always synchronize to ensure tables exist
   logging: process.env.NODE_ENV === 'development',
   entities: [User, Scan, ScanResult, ScheduledScan],
   migrations: ['src/migrations/*.ts'],
