@@ -1,0 +1,94 @@
+name: cobytes-security-platform-prod
+region: ams
+domains:
+  - domain: api.securityscan.cobytes.com
+    type: PRIMARY
+
+databases:
+  - name: cobytes-db
+    engine: PG
+    version: "15"
+    size: db-s-1vcpu-1gb
+    num_nodes: 1
+
+services:
+  - name: api
+    github:
+      repo: RoscoNL/cobytes-security-platform
+      branch: main
+      deploy_on_push: true
+    source_dir: /backend
+    dockerfile_path: backend/Dockerfile.prod
+    http_port: 3001
+    instance_count: 1
+    instance_size_slug: basic-xs
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 10
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      - key: NODE_ENV
+        value: production
+        scope: RUN_TIME
+      - key: PORT
+        value: "3001"
+        scope: RUN_TIME
+      - key: DATABASE_URL
+        value: ${cobytes-db.DATABASE_URL}
+        scope: RUN_TIME
+      - key: JWT_SECRET
+        type: SECRET
+        scope: RUN_TIME
+      - key: JWT_REFRESH_SECRET
+        type: SECRET
+        scope: RUN_TIME
+      - key: PENTEST_TOOLS_API_KEY
+        value: "43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7"
+        scope: RUN_TIME
+      - key: PENTEST_TOOLS_API_URL
+        value: "https://app.pentest-tools.com/api/v2"
+        scope: RUN_TIME
+      - key: CORS_ORIGIN
+        value: "https://securityscan.cobytes.com,http://localhost:3000"
+        scope: RUN_TIME
+      - key: REDIS_URL
+        value: "redis://localhost:6379"
+        scope: RUN_TIME
+    
+static_sites:
+  - name: frontend
+    github:
+      repo: RoscoNL/cobytes-security-platform
+      branch: main
+      deploy_on_push: true
+    source_dir: /frontend
+    build_command: npm install && npm run build
+    output_dir: build
+    index_document: index.html
+    error_document: index.html
+    catchall_document: index.html
+    envs:
+      - key: REACT_APP_API_URL
+        value: "https://api.securityscan.cobytes.com"
+        scope: BUILD_TIME
+      - key: NODE_ENV
+        value: production
+        scope: BUILD_TIME
+
+jobs:
+  - name: db-migrate
+    kind: PRE_DEPLOY
+    github:
+      repo: RoscoNL/cobytes-security-platform
+      branch: main
+    source_dir: /backend
+    run_command: npm run migrate
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    envs:
+      - key: DATABASE_URL
+        value: ${cobytes-db.DATABASE_URL}
+        scope: RUN_TIME

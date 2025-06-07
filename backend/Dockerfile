@@ -61,4 +61,4 @@ EXPOSE 3001
 ENTRYPOINT ["dumb-init", "--"]
 
 # Start the application with tsconfig-paths
-CMD ["node", "-r", "tsconfig-paths/register", "dist/server.js"]
+CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
