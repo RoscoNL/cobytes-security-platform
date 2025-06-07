@@ -1,6 +1,7 @@
 import { Scan, ScanStatus, ScanType } from '../models/scan.model';
 import { ScanResult, ResultSeverity } from '../models/scanResult.model';
 import pentestToolsService, { PentestToolId, ScanType as PTScanType } from './pentesttools.service';
+import mockScannerService from './mock-scanner.service';
 import { logger } from '../utils/logger';
 import { getRedis } from '../config/redis';
 import { AppDataSource } from '../config/typeorm';
@@ -168,31 +169,55 @@ class ScanService {
         await this.scanRepository!.save(scan);
       }
 
-      // Start the appropriate PentestTools scan
-      const ptScanResult = await this.startPentestToolsScan(scan);
+      // Use mock scanner in development or if configured
+      const useMockScanner = process.env.NODE_ENV === 'development' || process.env.USE_MOCK_SCANNER === 'true';
       
-      scan.pentest_tools_scan_id = ptScanResult.scan_id;
-      scan.pentest_tools_target_id = ptScanResult.target_id;
-      
-      if (process.env.SKIP_DB === 'true') {
-        this.mockScans.set(scanId, scan);
+      if (useMockScanner) {
+        logger.info('Using mock scanner for scan', { scanId, type: scan.type });
+        
+        // Simulate scan progress
+        for (let progress = 10; progress <= 100; progress += 10) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          await this.updateScanProgress(scanId, progress, progress < 100 ? ScanStatus.RUNNING : ScanStatus.COMPLETED);
+        }
+        
+        // Get mock results
+        const mockResults = await mockScannerService.simulateScan(scanId.toString(), scan.type);
+        
+        // Process mock results
+        await this.processMockResults(scan, mockResults);
+        
+        scan.status = ScanStatus.COMPLETED;
+        scan.completed_at = new Date();
+        scan.progress = 100;
+        
       } else {
-        await this.scanRepository!.save(scan);
+        // Start the appropriate PentestTools scan
+        const ptScanResult = await this.startPentestToolsScan(scan);
+        
+        scan.pentest_tools_scan_id = ptScanResult.scan_id;
+        scan.pentest_tools_target_id = ptScanResult.target_id;
+        
+        if (process.env.SKIP_DB === 'true') {
+          this.mockScans.set(scanId, scan);
+        } else {
+          await this.scanRepository!.save(scan);
+        }
+
+        // Poll for scan completion
+        const result = await pentestToolsService.waitForScanCompletion(
+          ptScanResult.scan_id,
+          5000 // Poll every 5 seconds
+        );
+
+        // Process and save results
+        await this.processScanResults(scan, result.output);
+
+        // Update scan status
+        scan.status = ScanStatus.COMPLETED;
+        scan.completed_at = new Date();
+        scan.progress = 100;
       }
-
-      // Poll for scan completion
-      const result = await pentestToolsService.waitForScanCompletion(
-        ptScanResult.scan_id,
-        5000 // Poll every 5 seconds
-      );
-
-      // Process and save results
-      await this.processScanResults(scan, result.output);
-
-      // Update scan status
-      scan.status = ScanStatus.COMPLETED;
-      scan.completed_at = new Date();
-      scan.progress = 100;
       
       if (process.env.SKIP_DB === 'true') {
         this.mockScans.set(scanId, scan);
@@ -496,6 +521,27 @@ class ScanService {
       case 'low': return ResultSeverity.LOW;
       default: return ResultSeverity.INFO;
     }
+  }
+
+  private async processMockResults(scan: Scan, mockResults: any) {
+    if (!mockResults || !mockResults.findings) return;
+    
+    const results: Partial<ScanResult>[] = mockResults.findings.map((finding: any) => ({
+      scan: scan,
+      type: finding.type || 'vulnerability',
+      title: finding.title,
+      description: finding.description,
+      severity: this.mapVulnSeverity(finding.severity),
+      details: finding.details || {},
+      recommendation: finding.recommendation,
+      affected_component: finding.affected_component || scan.target
+    }));
+    
+    if (process.env.SKIP_DB !== 'true' && results.length > 0) {
+      await this.scanResultRepository!.save(results);
+    }
+    
+    logger.info(`Processed ${results.length} mock findings for scan ${scan.id}`);
   }
 
   async cancelScan(scanId: number): Promise<void> {

@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-06-07T21:31:09.716Z",
+  "environment": "local",
+  "tests": {
+    "apiHealth": "PASSED",
+    "authentication": "PASSED",
+    "loginFlow": "PASSED"
+  },
+  "navigation": {
+    "Dashboard": "PASSED",
+    "Security Dashboard": "PASSED",
+    "Scans": "PASSED",
+    "Reports": "PASSED",
+    "All Scanners": "PASSED",
+    "Pricing": "PASSED",
+    "New Scan Button": "PASSED"
+  },
+  "forms": {
+    "scanCreation": "PASSED",
+    "search": "PASSED",
+    "filters": "NOT_FOUND"
+  },
+  "features": {
+    "scanDetails": "PASSED",
+    "reportGeneration": "NO_BUTTON",
+    "scannerTypes": 36,
+    "scanCreation": "PASSED",
+    "scanExecution": "PASSED"
+  },
+  "errors": [],
+  "summary": {
+    "totalTests": 18,
+    "passed": 14,
+    "failed": 0,
+    "errors": 0
+  }
+}

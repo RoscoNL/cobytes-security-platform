@@ -5,6 +5,16 @@ import { logger } from '@utils/logger';
 
 const router = Router();
 
+// Health check endpoint
+router.get('/health', (req: Request, res: Response) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    service: 'cobytes-security-platform',
+    version: '2.0.0'
+  });
+});
+
 // Check API status
 router.get('/api-status', asyncHandler(async (req: Request, res: Response) => {
   const apiKey = process.env.PENTEST_TOOLS_API_KEY;

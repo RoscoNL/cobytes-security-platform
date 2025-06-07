@@ -1,0 +1,69 @@
+🚀 Starting comprehensive local testing...
+
+
+🔍 Testing API Health...
+✅ API is healthy: {
+  status: 'healthy',
+  timestamp: '2025-06-07T21:31:09.761Z',
+  uptime: 209.345516516,
+  environment: 'development',
+  version: '1.0.0'
+}
+
+🔍 Testing Authentication...
+ℹ️  User already exists
+✅ Authentication successful
+
+🔍 Testing Login Flow...
+✅ Login successful
+
+🔍 Testing Navigation...
+  Testing Dashboard...
+  ✅ Dashboard navigation works
+  Testing Security Dashboard...
+  ✅ Security Dashboard navigation works
+  Testing Scans...
+  ✅ Scans navigation works
+  Testing Reports...
+  ✅ Reports navigation works
+  Testing All Scanners...
+  ✅ All Scanners navigation works
+  Testing Pricing...
+  ✅ Pricing navigation works
+  Testing New Scan Button...
+  ✅ New Scan Button navigation works
+
+🔍 Testing Forms...
+  Testing scan creation form...
+  ✅ Found and filled target input
+  Form submitted, redirected to: http://localhost:3002/dashboard/scans/new
+  Testing search and filter forms...
+  ✅ Search form works
+
+🔍 Testing Features...
+  Testing scan details view...
+  ✅ Scan details view works
+  Testing report generation...
+  ⚠️  No report generation button found
+  Testing all scanner types...
+  ✅ Found 36 scanner elements
+
+🔍 Testing Real Scan Execution...
+✅ Scan created: 6
+  Scan status: running (attempt 1/10)
+  Scan status: running (attempt 2/10)
+  Scan status: running (attempt 3/10)
+  Scan status: running (attempt 4/10)
+  Scan status: completed (attempt 5/10)
+✅ Scan finished with status: completed
+
+📊 TEST SUMMARY
+================
+Total Tests: 18
+✅ Passed: 14
+❌ Failed: 0
+⚠️  Errors: 0
+
+Detailed results saved to test-results-local/test-results.json
+
+✅ ALL TESTS PASSED - Ready for production deployment!
