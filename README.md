@@ -12,8 +12,8 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/[username]/cobytes-platform.git
-cd cobytes-platform
+git clone https://github.com/RoscoNL/cobytes-security-platform.git
+cd cobytes-security-platform
 
 # Setup environment
 cp .env.example .env
