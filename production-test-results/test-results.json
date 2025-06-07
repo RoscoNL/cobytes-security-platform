@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-06-07T21:00:53.231Z",
+  "tests": {
+    "authentication": "PASSED",
+    "frontendLogin": "PASSED",
+    "frontendScans": "PASSED",
+    "reportGeneration": "SKIPPED"
+  },
+  "scans": [
+    {
+      "type": "wordpress",
+      "target": "https://www.cobytes.com",
+      "status": "timeout"
+    },
+    {
+      "type": "ssl",
+      "target": "cobytes.com",
+      "status": "failed",
+      "error": "Request failed with status code 500"
+    },
+    {
+      "type": "dns_lookup",
+      "target": "cobytes.com",
+      "status": "failed",
+      "error": "Request failed with status code 400"
+    }
+  ],
+  "summary": {
+    "totalTests": 4,
+    "passed": 3,
+    "failed": 0,
+    "totalScans": 3,
+    "completedScans": 0,
+    "failedScans": 2
+  }
+}

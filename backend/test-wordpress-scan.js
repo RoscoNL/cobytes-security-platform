@@ -2,15 +2,53 @@ const axios = require('axios');
 
 const BACKEND_URL = 'http://localhost:3001';
 const TARGET = 'https://www.cobytes.com';
+let authToken = null;
+
+// Add authentication function
+async function authenticate() {
+  try {
+    // Try to register first
+    const registerData = {
+      email: 'test@cobytes.com',
+      password: 'TestPassword123!',
+      name: 'Test User'
+    };
+    
+    try {
+      const registerResponse = await axios.post(`${BACKEND_URL}/api/v1/auth/register`, registerData);
+      console.log('✅ User registered successfully');
+      authToken = registerResponse.data.data.tokens.accessToken;
+    } catch (err) {
+      // If registration fails, try login
+      if (err.response && err.response.status === 409) {
+        console.log('📝 User exists, logging in...');
+        const loginResponse = await axios.post(`${BACKEND_URL}/api/v1/auth/login`, {
+          email: registerData.email,
+          password: registerData.password
+        });
+        authToken = loginResponse.data.data.tokens.accessToken;
+        console.log('✅ Logged in successfully');
+      } else {
+        throw err;
+      }
+    }
+  } catch (error) {
+    console.error('❌ Authentication failed:', error.response?.data || error.message);
+    throw error;
+  }
+}
 
 async function testWordPressScan() {
   try {
     console.log('🔍 WordPress Scan Test for Cobytes.com');
     console.log('=====================================\n');
     
+    // Authenticate first
+    await authenticate();
+    
     // Step 1: Create WordPress scan
-    console.log('📡 Starting WordPress scan on', TARGET);
-    const scanResponse = await axios.post(`${BACKEND_URL}/api/scans`, {
+    console.log('\n📡 Starting WordPress scan on', TARGET);
+    const scanResponse = await axios.post(`${BACKEND_URL}/api/v1/scans`, {
       target: TARGET,
       type: 'wordpress',
       parameters: {
