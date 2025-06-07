@@ -1,0 +1,39 @@
+🚀 Starting comprehensive PRODUCTION testing...
+
+🌐 Testing against: https://securityscan.cobytes.com
+===============================================
+
+
+🔍 Testing Production API Health...
+❌ Production API health check failed: Request failed with status code 404
+
+❌ Production API is not healthy. Critical issue!
+
+🔍 Testing Production Authentication...
+❌ Production authentication failed: Request failed with status code 404
+
+❌ Production authentication failed. Critical issue!
+
+🔍 Testing Production Landing Page...
+
+🔍 Testing Production Login Flow...
+
+❌ Production test failed: No element found for selector: input[name="email"], input[type="email"]
+
+📊 PRODUCTION TEST SUMMARY
+==========================
+Environment: PRODUCTION
+URL: https://securityscan.cobytes.com
+Total Tests: 3
+✅ Passed: 1
+❌ Failed: 2
+⚠️  Errors: 3
+
+Detailed results saved to test-results-production/test-results.json
+
+❌ PRODUCTION TESTS FAILED - Critical issues detected!
+
+Failed tests:
+  - apiHealth: Request failed with status code 404
+  - authentication: Request failed with status code 404
+  - general: No element found for selector: input[name="email"], input[type="email"]

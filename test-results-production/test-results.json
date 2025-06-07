@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-06-07T21:36:43.343Z",
+  "environment": "production",
+  "tests": {
+    "apiHealth": "FAILED",
+    "authentication": "FAILED",
+    "landingPage": "PASSED"
+  },
+  "navigation": {},
+  "forms": {},
+  "features": {},
+  "errors": [
+    {
+      "test": "apiHealth",
+      "error": "Request failed with status code 404"
+    },
+    {
+      "test": "authentication",
+      "error": "Request failed with status code 404"
+    },
+    {
+      "test": "general",
+      "error": "No element found for selector: input[name=\"email\"], input[type=\"email\"]"
+    }
+  ],
+  "summary": {
+    "totalTests": 3,
+    "passed": 1,
+    "failed": 2,
+    "errors": 3
+  }
+}
