@@ -33,7 +33,7 @@ services:
       DATABASE_URL: postgresql://cobytes_user:cobytes_password@postgres:5432/cobytes_db
       JWT_SECRET: ${JWT_SECRET:-your-jwt-secret-change-in-production}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-refresh-secret-change-in-production}
-      PENTEST_TOOLS_API_KEY: ${PENTEST_TOOLS_API_KEY:-sk-FBjMQcPq8jJ97Eu5nVgLhA}
+      PENTEST_TOOLS_API_KEY: ${PENTEST_TOOLS_API_KEY:-43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
     depends_on:
       postgres:

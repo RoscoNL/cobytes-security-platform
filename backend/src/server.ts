@@ -1,9 +1,13 @@
+import dotenv from 'dotenv';
+
+// Load environment variables FIRST before any other imports
+dotenv.config();
+
 import express, { Application } from 'express';
 import { createServer } from 'http';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import { errorHandler } from '@middleware/errorHandler';
 import { notFoundHandler } from '@middleware/notFoundHandler';
 import { requestLogger } from '@middleware/requestLogger';
@@ -14,9 +18,6 @@ import { initializeDatabase } from '@config/typeorm';
 import { connectRedis } from '@config/redis';
 import WebSocketService from '@services/websocket.service';
 import schedulerService from '@services/scheduler.service';
-
-// Load environment variables
-dotenv.config();
 
 // Create Express application
 const app: Application = express();

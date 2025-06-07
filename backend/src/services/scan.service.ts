@@ -269,10 +269,22 @@ class ScanService {
 
       // CMS Scanners
       case ScanType.WORDPRESS:
-        return pentestToolsService.startWordPressScan(scan.target, {
-          scan_type: scan.parameters.scan_type || PTScanType.DEEP,
-          enumerate: scan.parameters.enumerate || ['users', 'plugins', 'themes']
-        });
+        const wpParams: any = {
+          scan_type: scan.parameters.scan_type || PTScanType.DEEP
+        };
+        
+        // Only add enumerate if scan_type is custom
+        if (scan.parameters.scan_type === 'custom') {
+          const enumerate = [];
+          if (scan.parameters.enumerate_users) enumerate.push('users');
+          if (scan.parameters.enumerate_plugins) enumerate.push('plugins');
+          if (scan.parameters.enumerate_themes) enumerate.push('themes');
+          if (enumerate.length > 0) {
+            wpParams.enumerate = enumerate;
+          }
+        }
+        
+        return pentestToolsService.startWordPressScan(scan.target, wpParams);
 
       case ScanType.DRUPAL:
         return pentestToolsService.startDrupalScan(scan.target, {
