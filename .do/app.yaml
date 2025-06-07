@@ -13,12 +13,11 @@ databases:
 
 services:
   - name: api
-    github:
-      repo: RoscoNL/cobytes-security-platform
+    git:
+      repo_clone_url: https://github.com/RoscoNL/cobytes-security-platform.git
       branch: main
-      deploy_on_push: true
     source_dir: /backend
-    dockerfile_path: backend/Dockerfile.prod
+    dockerfile_path: backend/Dockerfile
     http_port: 3001
     instance_count: 1
     instance_size_slug: basic-xs
@@ -60,15 +59,13 @@ services:
     
 static_sites:
   - name: frontend
-    github:
-      repo: RoscoNL/cobytes-security-platform
+    git:
+      repo_clone_url: https://github.com/RoscoNL/cobytes-security-platform.git
       branch: main
-      deploy_on_push: true
     source_dir: /frontend
     build_command: npm install && npm run build
     output_dir: build
     index_document: index.html
-    error_document: index.html
     catchall_document: index.html
     envs:
       - key: REACT_APP_API_URL
@@ -78,11 +75,24 @@ static_sites:
         value: production
         scope: BUILD_TIME
 
+ingress:
+  rules:
+    - match:
+        path:
+          prefix: /api
+      component:
+        name: api
+    - match:
+        path:
+          prefix: /
+      component:
+        name: frontend
+
 jobs:
   - name: db-migrate
     kind: PRE_DEPLOY
-    github:
-      repo: RoscoNL/cobytes-security-platform
+    git:
+      repo_clone_url: https://github.com/RoscoNL/cobytes-security-platform.git
       branch: main
     source_dir: /backend
     run_command: npm run migrate
