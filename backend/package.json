@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "migrate": "echo 'No migrations needed - TypeORM handles schema synchronization automatically'"
   },
   "dependencies": {
     "@types/node-cron": "^3.0.11",

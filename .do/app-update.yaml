@@ -1,0 +1,84 @@
+spec:
+  name: cobytes-security-platform
+  services:
+    - name: api
+      git:
+        repo_clone_url: https://github.com/RoscoNL/cobytes-security-platform.git
+        branch: main
+      source_dir: /backend
+      dockerfile_path: backend/Dockerfile
+      http_port: 3001
+      instance_count: 1
+      instance_size_slug: basic-xs
+      health_check:
+        http_path: /health
+        initial_delay_seconds: 10
+        period_seconds: 30
+        timeout_seconds: 10
+        success_threshold: 1
+        failure_threshold: 3
+      envs:
+        - key: NODE_ENV
+          value: production
+          scope: RUN_TIME
+        - key: PORT
+          value: "3001"
+          scope: RUN_TIME
+        - key: DATABASE_URL
+          value: "postgresql://user:password@localhost:5432/cobytes"
+          scope: RUN_TIME
+        - key: JWT_SECRET
+          value: "your-jwt-secret-here"
+          scope: RUN_TIME
+        - key: JWT_REFRESH_SECRET
+          value: "your-jwt-refresh-secret-here"
+          scope: RUN_TIME
+        - key: PENTEST_TOOLS_API_KEY
+          value: "43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7"
+          scope: RUN_TIME
+        - key: PENTEST_TOOLS_API_URL
+          value: "https://app.pentest-tools.com/api/v2"
+          scope: RUN_TIME
+        - key: CORS_ORIGIN
+          value: "https://securityscan.cobytes.com,http://localhost:3000"
+          scope: RUN_TIME
+        - key: REDIS_URL
+          value: "redis://localhost:6379"
+          scope: RUN_TIME
+    
+  static_sites:
+    - name: frontend
+      git:
+        repo_clone_url: https://github.com/RoscoNL/cobytes-security-platform.git
+        branch: main
+      source_dir: /frontend
+      build_command: npm install && npm run build
+      output_dir: build
+      index_document: index.html
+      catchall_document: index.html
+      envs:
+        - key: REACT_APP_API_URL
+          value: "https://securityscan.cobytes.com/api"
+          scope: BUILD_TIME
+        - key: NODE_ENV
+          value: production
+          scope: BUILD_TIME
+
+  domains:
+    - domain: securityscan.cobytes.com
+      type: PRIMARY
+
+  region: ams
+
+  ingress:
+    rules:
+      - match:
+          path:
+            prefix: /api
+        component:
+          name: api
+      - match:
+          path:
+            prefix: /
+        component:
+          name: frontend
