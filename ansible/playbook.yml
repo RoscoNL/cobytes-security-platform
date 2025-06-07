@@ -1,0 +1,244 @@
+---
+- name: Deploy Cobytes Security Platform
+  hosts: cobytes-vps
+  become: yes
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+    
+    - name: Install system dependencies
+      apt:
+        name:
+          - curl
+          - git
+          - nginx
+          - postgresql
+          - postgresql-contrib
+          - python3-psycopg2
+          - certbot
+          - python3-certbot-nginx
+          - ufw
+        state: present
+    
+    - name: Install Node.js repository
+      shell: |
+        curl -fsSL https://deb.nodesource.com/setup_{{ node_version }}.x | sudo -E bash -
+      args:
+        creates: /etc/apt/sources.list.d/nodesource.list
+    
+    - name: Install Node.js
+      apt:
+        name: nodejs
+        state: present
+    
+    - name: Create app user
+      user:
+        name: "{{ app_user }}"
+        shell: /bin/bash
+        home: "/home/{{ app_user }}"
+        create_home: yes
+    
+    - name: Create app directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+    
+    - name: Clone repository
+      git:
+        repo: https://github.com/RoscoNL/cobytes-security-platform.git
+        dest: "{{ app_dir }}"
+        version: main
+        force: yes
+      become_user: "{{ app_user }}"
+    
+    - name: Create PostgreSQL database
+      postgresql_db:
+        name: "{{ db_name }}"
+        encoding: UTF-8
+        state: present
+      become_user: postgres
+    
+    - name: Create PostgreSQL user
+      postgresql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        db: "{{ db_name }}"
+        priv: ALL
+        state: present
+      become_user: postgres
+    
+    - name: Create backend .env file
+      copy:
+        dest: "{{ app_dir }}/backend/.env"
+        content: |
+          NODE_ENV=production
+          PORT={{ backend_port }}
+          DATABASE_URL=postgresql://{{ db_user }}:{{ db_password }}@localhost:5432/{{ db_name }}
+          JWT_SECRET={{ jwt_secret }}
+          JWT_REFRESH_SECRET={{ jwt_refresh_secret }}
+          PENTEST_TOOLS_API_KEY={{ pentest_tools_api_key }}
+          PENTEST_TOOLS_API_URL={{ pentest_tools_api_url }}
+          CORS_ORIGIN=https://{{ domain_name }}
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0600'
+    
+    - name: Install backend dependencies
+      npm:
+        path: "{{ app_dir }}/backend"
+        production: no
+      become_user: "{{ app_user }}"
+    
+    - name: Build backend
+      command: npm run build
+      args:
+        chdir: "{{ app_dir }}/backend"
+      become_user: "{{ app_user }}"
+    
+    - name: Install frontend dependencies
+      npm:
+        path: "{{ app_dir }}/frontend"
+        production: no
+      become_user: "{{ app_user }}"
+    
+    - name: Create frontend .env file
+      copy:
+        dest: "{{ app_dir }}/frontend/.env"
+        content: |
+          REACT_APP_API_URL=https://{{ domain_name }}/api
+          NODE_ENV=production
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0644'
+    
+    - name: Build frontend
+      command: npm run build
+      args:
+        chdir: "{{ app_dir }}/frontend"
+      become_user: "{{ app_user }}"
+      environment:
+        REACT_APP_API_URL: "https://{{ domain_name }}/api"
+        NODE_ENV: production
+    
+    - name: Create systemd service for backend
+      copy:
+        dest: /etc/systemd/system/cobytes-backend.service
+        content: |
+          [Unit]
+          Description=Cobytes Security Platform Backend
+          After=network.target postgresql.service
+          
+          [Service]
+          Type=simple
+          User={{ app_user }}
+          WorkingDirectory={{ app_dir }}/backend
+          ExecStart=/usr/bin/node dist/server.js
+          Restart=always
+          RestartSec=10
+          StandardOutput=syslog
+          StandardError=syslog
+          SyslogIdentifier=cobytes-backend
+          Environment="NODE_ENV=production"
+          
+          [Install]
+          WantedBy=multi-user.target
+    
+    - name: Configure Nginx
+      copy:
+        dest: /etc/nginx/sites-available/cobytes
+        content: |
+          server {
+              listen 80;
+              server_name {{ domain_name }};
+              
+              # Frontend
+              location / {
+                  root {{ app_dir }}/frontend/build;
+                  try_files $uri $uri/ /index.html;
+              }
+              
+              # Backend API
+              location /api {
+                  proxy_pass http://localhost:{{ backend_port }};
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_cache_bypass $http_upgrade;
+                  proxy_read_timeout 86400;
+              }
+              
+              # WebSocket support
+              location /socket.io {
+                  proxy_pass http://localhost:{{ backend_port }};
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+              }
+          }
+    
+    - name: Enable Nginx site
+      file:
+        src: /etc/nginx/sites-available/cobytes
+        dest: /etc/nginx/sites-enabled/cobytes
+        state: link
+    
+    - name: Remove default Nginx site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+    
+    - name: Test Nginx configuration
+      command: nginx -t
+    
+    - name: Configure UFW firewall
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - 22
+        - 80
+        - 443
+    
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+    
+    - name: Start and enable services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      loop:
+        - postgresql
+        - nginx
+        - cobytes-backend
+    
+    - name: Obtain SSL certificate
+      command: |
+        certbot --nginx -d {{ domain_name }} --non-interactive --agree-tos --email info@cobytes.com --redirect
+      args:
+        creates: /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem
+    
+    - name: Create certificate renewal cron job
+      cron:
+        name: "Renew SSL certificates"
+        special_time: daily
+        job: "certbot renew --quiet && systemctl reload nginx"

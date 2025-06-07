@@ -1,0 +1,28 @@
+all:
+  hosts:
+    cobytes-vps:
+      ansible_host: YOUR_VPS_IP_HERE
+      ansible_user: root
+      ansible_ssh_private_key_file: ~/.ssh/id_rsa
+      
+  vars:
+    app_name: cobytes-security-platform
+    app_user: cobytes
+    app_dir: /opt/cobytes-security-platform
+    node_version: "18"
+    domain_name: securityscan.cobytes.com
+    backend_port: 3001
+    frontend_port: 3000
+    
+    # API Configuration
+    pentest_tools_api_key: "43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7"
+    pentest_tools_api_url: "https://app.pentest-tools.com/api/v2"
+    
+    # Security
+    jwt_secret: "cobytes-jwt-secret-prod-2024"
+    jwt_refresh_secret: "cobytes-jwt-refresh-secret-prod-2024"
+    
+    # Database
+    db_name: cobytes_db
+    db_user: cobytes_user
+    db_password: "CHANGE_THIS_SECURE_PASSWORD"
