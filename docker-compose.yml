@@ -11,52 +11,94 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U cobytes_user -d cobytes_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - cobytes-network
+
+  # Redis for session management
+  redis:
+    image: redis:7-alpine
+    container_name: cobytes-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cobytes-network
 
   # Backend API
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: cobytes-backend
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3000
-      DATABASE_URL: postgresql://cobytes_user:cobytes_password@postgres:5432/cobytes_db
-      JWT_SECRET: ${JWT_SECRET:-your-jwt-secret-change-in-production}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-refresh-secret-change-in-production}
-      PENTEST_TOOLS_API_KEY: ${PENTEST_TOOLS_API_KEY:-43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./backend/uploads:/app/uploads
-      - ./backend/logs:/app/logs
-
-  # Frontend (if exists)
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: cobytes-frontend
     restart: unless-stopped
     ports:
       - "3001:3001"
     environment:
-      REACT_APP_API_URL: http://localhost:3000/api/v1
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3001
+      DATABASE_URL: postgresql://cobytes_user:cobytes_password@postgres:5432/cobytes_db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-development-jwt-secret-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-development-refresh-secret-change-in-production}
+      SESSION_SECRET: ${SESSION_SECRET:-development-session-secret-change-in-production}
+      PENTEST_TOOLS_API_KEY: ${PENTEST_TOOLS_API_KEY:-43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7}
+      PENTEST_TOOLS_API_URL: https://app.pentest-tools.com/api/v2
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3002,http://localhost:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3002}
+      HOSTFACT_API_KEY: ${HOSTFACT_API_KEY:-6685741463b3d6791e31779df6a99a92}
+      HOSTFACT_URL: ${HOSTFACT_URL:-https://secure.cobytes.com/Pro/apiv2/api.php}
+      MULTISAFEPAY_API_KEY: ${MULTISAFEPAY_API_KEY:-}
+      MULTISAFEPAY_SITE_ID: ${MULTISAFEPAY_SITE_ID:-}
+      MULTISAFEPAY_SITE_CODE: ${MULTISAFEPAY_SITE_CODE:-}
+      MULTISAFEPAY_TEST_MODE: ${MULTISAFEPAY_TEST_MODE:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/uploads:/app/uploads
+      - ./backend/logs:/app/logs
+      - /app/node_modules
+    command: sh -c "npm run migrate && npm run dev"
+    networks:
+      - cobytes-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:3001}
+        REACT_APP_WS_URL: ${REACT_APP_WS_URL:-ws://localhost:3001}
+    container_name: cobytes-frontend
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
     depends_on:
       - backend
-    profiles:
-      - with-frontend
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - /app/node_modules
+    networks:
+      - cobytes-network
 
   # pgAdmin (optional, for database management)
   pgadmin:
@@ -64,18 +106,20 @@ services:
     container_name: cobytes-pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@cobytes.nl
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@cobytes.nl}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     ports:
       - "5050:80"
     depends_on:
       - postgres
     profiles:
       - tools
+    networks:
+      - cobytes-network
 
 volumes:
   postgres_data:
 
 networks:
-  default:
-    name: cobytes-network
+  cobytes-network:
+    driver: bridge

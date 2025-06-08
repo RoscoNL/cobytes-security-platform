@@ -20,6 +20,7 @@ import { connectRedis } from '@config/redis';
 import WebSocketService from '@services/websocket.service';
 import schedulerService from '@services/scheduler.service';
 import productService from '@services/product.service';
+import couponService from '@services/coupon.service';
 
 // Create Express application
 const app: Application = express();
@@ -61,6 +62,7 @@ const startServer = async () => {
     
     // Initialize services
     await productService.initializeProducts();
+    await couponService.initializeDefaultCoupons();
     
     // Initialize WebSocket service
     const wsService = new WebSocketService(httpServer);

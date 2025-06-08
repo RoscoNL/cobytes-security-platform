@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        button {
+            margin: 10px 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cart API Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Cart Functionality</h2>
+        <button onclick="getCart()">Get Cart</button>
+        <button onclick="addToCart()">Add Product to Cart</button>
+        <button onclick="clearCart()">Clear Cart</button>
+        <button onclick="checkSessionPersistence()">Check Session Persistence</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://securityscan.cobytes.com/api/api';
+        const resultsDiv = document.getElementById('results');
+
+        function log(message, isError = false) {
+            const div = document.createElement('div');
+            div.className = isError ? 'error' : 'success';
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            resultsDiv.appendChild(div);
+            
+            if (resultsDiv.children.length > 10) {
+                resultsDiv.removeChild(resultsDiv.firstChild);
+            }
+        }
+
+        async function getCart() {
+            try {
+                log('Getting cart...');
+                const response = await fetch(`${API_BASE}/cart`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                log(`Cart retrieved: <pre>${JSON.stringify(data, null, 2)}</pre>`);
+                
+                // Check for session cookie
+                const cookies = document.cookie;
+                log(`Current cookies: ${cookies || 'No cookies found'}`);
+                
+                // Check session_id
+                if (data.data && data.data.session_id) {
+                    log(`Session ID: ${data.data.session_id}`);
+                    if (data.data.session_id === 'default-session') {
+                        log('WARNING: Using default session ID - sessions may not persist!', true);
+                    }
+                }
+                
+            } catch (error) {
+                log(`Error getting cart: ${error.message}`, true);
+            }
+        }
+
+        async function addToCart() {
+            try {
+                log('Adding product to cart...');
+                const response = await fetch(`${API_BASE}/cart/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: 1,
+                        quantity: 1
+                    }),
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                log(`Product added: <pre>${JSON.stringify(data, null, 2)}</pre>`);
+                
+            } catch (error) {
+                log(`Error adding to cart: ${error.message}`, true);
+            }
+        }
+
+        async function clearCart() {
+            try {
+                log('Clearing cart...');
+                const response = await fetch(`${API_BASE}/cart/clear`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                log(`Cart cleared: <pre>${JSON.stringify(data, null, 2)}</pre>`);
+                
+            } catch (error) {
+                log(`Error clearing cart: ${error.message}`, true);
+            }
+        }
+
+        async function checkSessionPersistence() {
+            try {
+                log('Testing session persistence...');
+                
+                // Step 1: Get initial cart
+                let response = await fetch(`${API_BASE}/cart`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'include'
+                });
+                let data1 = await response.json();
+                const sessionId1 = data1.data?.session_id;
+                const itemCount1 = data1.data?.items?.length || 0;
+                
+                log(`Initial cart - Session: ${sessionId1}, Items: ${itemCount1}`);
+                
+                // Step 2: Add an item
+                response = await fetch(`${API_BASE}/cart/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ productId: 2, quantity: 1 }),
+                    credentials: 'include'
+                });
+                await response.json();
+                
+                // Step 3: Get cart again
+                response = await fetch(`${API_BASE}/cart`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'include'
+                });
+                let data2 = await response.json();
+                const sessionId2 = data2.data?.session_id;
+                const itemCount2 = data2.data?.items?.length || 0;
+                
+                log(`After adding item - Session: ${sessionId2}, Items: ${itemCount2}`);
+                
+                // Check results
+                if (sessionId1 === sessionId2) {
+                    log('✓ Session ID is consistent');
+                } else {
+                    log('✗ Session ID changed!', true);
+                }
+                
+                if (itemCount2 > itemCount1) {
+                    log('✓ Item was added to cart');
+                } else {
+                    log('✗ Item was not persisted', true);
+                }
+                
+                if (sessionId1 === 'default-session') {
+                    log('⚠️ WARNING: Using default session - SESSION_SECRET may be missing!', true);
+                }
+                
+            } catch (error) {
+                log(`Error in session test: ${error.message}`, true);
+            }
+        }
+
+        // Run initial cart check on load
+        window.onload = () => {
+            getCart();
+        };
+    </script>
+</body>
+</html>

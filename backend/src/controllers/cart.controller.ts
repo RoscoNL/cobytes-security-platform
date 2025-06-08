@@ -141,6 +141,8 @@ export const cartController = {
     try {
       const { cartId } = req.params;
       const { couponCode } = req.body;
+      const userId = req.user?.id;
+      const sessionId = req.headers['x-session-id'] as string || req.session?.id;
       
       if (!couponCode) {
         return res.status(400).json({
@@ -149,7 +151,12 @@ export const cartController = {
         });
       }
       
-      const cart = await cartService.applyCoupon(parseInt(cartId), couponCode);
+      const cart = await cartService.applyCoupon(
+        parseInt(cartId), 
+        couponCode,
+        userId,
+        sessionId
+      );
       
       res.json({
         success: true,
@@ -157,7 +164,7 @@ export const cartController = {
       });
     } catch (error) {
       logger.error('Error applying coupon:', error);
-      res.status(500).json({
+      res.status(400).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to apply coupon'
       });

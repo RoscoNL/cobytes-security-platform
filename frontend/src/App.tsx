@@ -31,6 +31,7 @@ import Checkout from './pages/Checkout';
 import OrderPayment from './pages/OrderPayment';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderCancelled from './pages/OrderCancelled';
+import Orders from './pages/Orders';
 import './App.css';
 
 function App() {
@@ -39,36 +40,38 @@ function App() {
       <CssBaseline />
       <Router>
         <Routes>
-          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/orders/:orderId/pay" element={<OrderPayment />} />
-          <Route path="/orders/:orderId/success" element={<OrderSuccess />} />
-          <Route path="/orders/:orderId/cancelled" element={<OrderCancelled />} />
-          <Route path="/free-scan" element={<FreeScan />} />
-          <Route path="/all-scanners-new" element={<AllScannersNew />} />
-          <Route path="/integration-status" element={<IntegrationStatus />} />
-          <Route path="/scan-status/:scanId" element={<ScanStatus />} />
-          <Route path="/scan-demo" element={<FreeScan />} />
-          <Route path="/security-dashboard" element={<SecurityDashboard />} />
-          <Route path="/dashboard" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="scans" element={<ScanList />} />
-            <Route path="scans/new" element={<ScanNew />} />
-            <Route path="scans/:id" element={<ScanDetail />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="scanners" element={<AllScanners />} />
-            <Route path="how-to" element={<HowTo />} />
-            <Route path="api-status" element={<ApiStatus />} />
-            <Route path="direct-scan" element={<DirectScan />} />
-            <Route path="cors-test" element={<CorsTest />} />
-            <Route path="proxy-scan" element={<ProxyScan />} />
-            <Route path="cors-proxy-test" element={<CorsProxyTest />} />
-            <Route path="all-scanners" element={<AllScannersNew />} />
-            <Route path="integration" element={<IntegrationStatus />} />
-            <Route path="pricing" element={<Pricing />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/:orderId/pay" element={<OrderPayment />} />
+            <Route path="/orders/:orderId/success" element={<OrderSuccess />} />
+            <Route path="/orders/:orderId/cancelled" element={<OrderCancelled />} />
+            <Route path="/free-scan" element={<FreeScan />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/how-to" element={<HowTo />} />
+            <Route path="/all-scanners-new" element={<AllScannersNew />} />
+            <Route path="/integration-status" element={<IntegrationStatus />} />
+            <Route path="/scan-status/:scanId" element={<ScanStatus />} />
+            <Route path="/scan-demo" element={<FreeScan />} />
+            <Route path="/security-dashboard" element={<SecurityDashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/scans" element={<ScanList />} />
+            <Route path="/dashboard/scans/new" element={<ScanNew />} />
+            <Route path="/dashboard/scans/:id" element={<ScanDetail />} />
+            <Route path="/dashboard/reports" element={<Reports />} />
+            <Route path="/dashboard/scanners" element={<AllScanners />} />
+            <Route path="/dashboard/how-to" element={<HowTo />} />
+            <Route path="/dashboard/api-status" element={<ApiStatus />} />
+            <Route path="/dashboard/direct-scan" element={<DirectScan />} />
+            <Route path="/dashboard/cors-test" element={<CorsTest />} />
+            <Route path="/dashboard/proxy-scan" element={<ProxyScan />} />
+            <Route path="/dashboard/cors-proxy-test" element={<CorsProxyTest />} />
+            <Route path="/dashboard/all-scanners" element={<AllScannersNew />} />
+            <Route path="/dashboard/integration" element={<IntegrationStatus />} />
           </Route>
         </Routes>
       </Router>

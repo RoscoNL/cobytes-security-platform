@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
@@ -17,6 +17,10 @@ import {
   Container,
   useTheme,
   useMediaQuery,
+  Menu,
+  MenuItem,
+  Avatar,
+  Chip,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -28,6 +32,12 @@ import {
   AttachMoney as PricingIcon,
   Add as AddIcon,
   Logout as LogoutIcon,
+  History as HistoryIcon,
+  PlayArrow as StartScanIcon,
+  GetApp as DownloadIcon,
+  Person as PersonIcon,
+  ShoppingCart as CartIcon,
+  Receipt as OrdersIcon,
 } from '@mui/icons-material';
 import { cobytesColors } from '../theme/cobytes-theme';
 
@@ -37,19 +47,62 @@ const Layout: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [user, setUser] = useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check authentication status
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (token && userData) {
+      setIsAuthenticated(true);
+      setUser(JSON.parse(userData));
+    }
+  }, [location]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Security Dashboard', icon: <SecurityIcon />, path: '/security-dashboard' },
-    { text: 'Scans', icon: <AssessmentIcon />, path: '/dashboard/scans' },
-    { text: 'Reports', icon: <DescriptionIcon />, path: '/dashboard/reports' },
-    { text: 'All Scanners', icon: <ScannerIcon />, path: '/dashboard/scanners' },
-    { text: 'Pricing', icon: <PricingIcon />, path: '/dashboard/pricing' },
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setUser(null);
+    navigate('/');
+  };
+
+  const publicMenuItems = [
+    { text: 'Home', icon: <DashboardIcon />, path: '/', highlight: false },
+    { text: 'Products', icon: <CartIcon />, path: '/products', highlight: false },
+    { text: 'Pricing', icon: <PricingIcon />, path: '/pricing', highlight: false },
+    { text: 'Free Demo', icon: <StartScanIcon />, path: '/scan-demo', highlight: false },
+    { text: 'How It Works', icon: <DescriptionIcon />, path: '/how-to', highlight: false },
   ];
+
+  const authenticatedMenuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', highlight: false },
+    { text: 'Start New Scan', icon: <StartScanIcon />, path: '/dashboard/scans/new', highlight: true },
+    { text: 'divider', icon: null, path: '', highlight: false },
+    { text: 'My Scans', icon: <AssessmentIcon />, path: '/dashboard/scans', highlight: false },
+    { text: 'Scan Reports', icon: <DownloadIcon />, path: '/dashboard/reports', highlight: false },
+    { text: 'divider', icon: null, path: '', highlight: false },
+    { text: 'Security Overview', icon: <SecurityIcon />, path: '/security-dashboard', highlight: false },
+    { text: 'All Scanners', icon: <ScannerIcon />, path: '/dashboard/scanners', highlight: false },
+    { text: 'divider', icon: null, path: '', highlight: false },
+    { text: 'My Orders', icon: <OrdersIcon />, path: '/orders', highlight: false },
+  ];
+
+  const menuItems = isAuthenticated ? authenticatedMenuItems : publicMenuItems;
 
   const drawer = (
     <Box>
@@ -69,45 +122,51 @@ const Layout: React.FC = () => {
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              selected={location.pathname === item.path}
-              onClick={() => {
-                navigate(item.path);
-                if (isMobile) setMobileOpen(false);
-              }}
-              sx={{
-                '&.Mui-selected': {
-                  backgroundColor: `${cobytesColors.orange}15`,
-                  borderLeft: `3px solid ${cobytesColors.orange}`,
-                  '&:hover': {
-                    backgroundColor: `${cobytesColors.orange}25`,
-                  },
-                },
-                '&:hover': {
-                  backgroundColor: `${cobytesColors.orange}10`,
-                },
-              }}
-            >
-              <ListItemIcon
+        {menuItems.map((item, index) => (
+          item.text === 'divider' ? (
+            <Divider key={`divider-${index}`} sx={{ my: 1 }} />
+          ) : (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                selected={location.pathname === item.path}
+                onClick={() => {
+                  navigate(item.path);
+                  if (isMobile) setMobileOpen(false);
+                }}
                 sx={{
-                  color: location.pathname === item.path ? cobytesColors.orange : cobytesColors.gray700,
+                  backgroundColor: item.highlight ? `${cobytesColors.orange}10` : 'transparent',
+                  '&.Mui-selected': {
+                    backgroundColor: `${cobytesColors.orange}15`,
+                    borderLeft: `3px solid ${cobytesColors.orange}`,
+                    '&:hover': {
+                      backgroundColor: `${cobytesColors.orange}25`,
+                    },
+                  },
+                  '&:hover': {
+                    backgroundColor: item.highlight ? `${cobytesColors.orange}20` : `${cobytesColors.orange}10`,
+                  },
+                  my: item.highlight ? 0.5 : 0,
                 }}
               >
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={item.text}
-                sx={{
-                  '& .MuiTypography-root': {
-                    fontWeight: location.pathname === item.path ? 600 : 400,
-                    color: location.pathname === item.path ? cobytesColors.orange : cobytesColors.gray900,
-                  },
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
+                <ListItemIcon
+                  sx={{
+                    color: item.highlight ? cobytesColors.orange : location.pathname === item.path ? cobytesColors.orange : cobytesColors.gray700,
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.text}
+                  sx={{
+                    '& .MuiTypography-root': {
+                      fontWeight: item.highlight ? 600 : location.pathname === item.path ? 600 : 400,
+                      color: item.highlight ? cobytesColors.orange : location.pathname === item.path ? cobytesColors.orange : cobytesColors.gray900,
+                    },
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )
         ))}
       </List>
     </Box>
@@ -140,27 +199,83 @@ const Layout: React.FC = () => {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
             {menuItems.find(item => item.path === location.pathname)?.text || 'Cobytes Security Platform'}
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/dashboard/scans/new')}
-            sx={{
-              bgcolor: cobytesColors.orange,
-              '&:hover': { bgcolor: cobytesColors.coral },
-              mr: 2,
-            }}
-          >
-            New Scan
-          </Button>
-          <IconButton
-            onClick={() => navigate('/')}
-            sx={{
-              color: cobytesColors.gray700,
-              '&:hover': { color: cobytesColors.navy },
-            }}
-          >
-            <LogoutIcon />
-          </IconButton>
+          
+          {!isAuthenticated ? (
+            <>
+              <Button
+                variant="outlined"
+                onClick={() => navigate('/cart')}
+                startIcon={<CartIcon />}
+                sx={{
+                  borderColor: cobytesColors.orange,
+                  color: cobytesColors.orange,
+                  '&:hover': { 
+                    borderColor: cobytesColors.coral,
+                    bgcolor: `${cobytesColors.orange}10`,
+                  },
+                  mr: 2,
+                }}
+              >
+                Cart
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => navigate('/login')}
+                sx={{
+                  bgcolor: cobytesColors.orange,
+                  '&:hover': { bgcolor: cobytesColors.coral },
+                }}
+              >
+                Login
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => navigate('/dashboard/scans/new')}
+                sx={{
+                  bgcolor: cobytesColors.orange,
+                  '&:hover': { bgcolor: cobytesColors.coral },
+                  mr: 2,
+                }}
+              >
+                Start Scan
+              </Button>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Chip
+                  avatar={<Avatar sx={{ bgcolor: cobytesColors.navy }}>{user?.email?.[0]?.toUpperCase()}</Avatar>}
+                  label={user?.email || 'User'}
+                  onClick={handleMenu}
+                  sx={{ cursor: 'pointer' }}
+                />
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={() => { handleClose(); navigate('/dashboard'); }}>
+                    <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
+                    My Dashboard
+                  </MenuItem>
+                  <MenuItem onClick={() => { handleClose(); navigate('/orders'); }}>
+                    <ListItemIcon><OrdersIcon fontSize="small" /></ListItemIcon>
+                    My Orders
+                  </MenuItem>
+                  <MenuItem onClick={() => { handleClose(); navigate('/dashboard/scans'); }}>
+                    <ListItemIcon><HistoryIcon fontSize="small" /></ListItemIcon>
+                    Scan History
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={handleLogout}>
+                    <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </Box>
+            </>
+          )}
         </Toolbar>
       </AppBar>
 

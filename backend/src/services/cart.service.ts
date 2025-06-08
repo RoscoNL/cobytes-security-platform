@@ -166,13 +166,27 @@ class CartService {
     return this.getCart(userCart.id);
   }
 
-  async applyCoupon(cartId: number, couponCode: string): Promise<Cart> {
+  async applyCoupon(cartId: number, couponCode: string, userId?: number, sessionId?: string): Promise<Cart> {
     const cart = await this.getCart(cartId);
     
-    // TODO: Implement coupon validation and discount calculation
-    // For now, apply a fixed 10% discount
-    cart.coupon_code = couponCode;
-    cart.discount_amount = cart.subtotal * 0.1;
+    // Import coupon service
+    const couponService = (await import('./coupon.service')).default;
+    
+    // Validate coupon
+    const validation = await couponService.validateCoupon(
+      couponCode, 
+      cart, 
+      userId, 
+      sessionId
+    );
+    
+    if (!validation.valid) {
+      throw new Error(validation.error || 'Invalid coupon');
+    }
+    
+    // Apply coupon
+    cart.coupon_code = couponCode.toUpperCase();
+    cart.discount_amount = validation.discount || 0;
     cart.calculateTotals();
     
     await this.cartRepository.save(cart);

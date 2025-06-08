@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Connection Test</title>
+</head>
+<body>
+    <h1>API Connection Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        async function testConnection() {
+            resultsDiv.innerHTML = '<p>Testing API connection...</p>';
+            
+            try {
+                // Test direct backend connection
+                const backendResponse = await fetch('http://localhost:3001/health');
+                const backendData = await backendResponse.json();
+                resultsDiv.innerHTML += `<p style="color: green;">✓ Backend direct connection: ${JSON.stringify(backendData)}</p>`;
+            } catch (error) {
+                resultsDiv.innerHTML += `<p style="color: red;">✗ Backend direct connection failed: ${error.message}</p>`;
+            }
+            
+            try {
+                // Test API products endpoint
+                const productsResponse = await fetch('http://localhost:3001/api/products');
+                const productsData = await productsResponse.json();
+                resultsDiv.innerHTML += `<p style="color: green;">✓ Products API: Found ${productsData.data?.length || 0} products</p>`;
+            } catch (error) {
+                resultsDiv.innerHTML += `<p style="color: red;">✗ Products API failed: ${error.message}</p>`;
+            }
+            
+            // Check if frontend is setting API URL correctly
+            resultsDiv.innerHTML += `<p>Frontend should connect to: http://localhost:3001</p>`;
+        }
+        
+        testConnection();
+    </script>
+</body>
+</html>

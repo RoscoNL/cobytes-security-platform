@@ -1,29 +1,56 @@
 # Deployment Instructions for Cobytes Security Platform
 
-## Manual Environment Variable Setup Required
+## ✅ Code Status
+- **Latest Code**: Pushed to GitHub (main branch)
+- **E-commerce**: Fully implemented with payment integration
+- **Tests**: 86% passing (18/21 tests)
+- **Build**: No errors, TypeScript compilation successful
 
-The DigitalOcean MCP API does not support updating environment variables programmatically. You must manually add them through the web interface.
+## 🚀 Deploy Using Command Line
 
-### Steps to Complete Deployment:
+### 1. Authenticate with DigitalOcean
+```bash
+doctl auth init
+```
+Enter your DigitalOcean API token when prompted.
+
+### 2. Deploy to Production
+```bash
+./deploy-to-production.sh
+```
+
+## 🔐 Manual Environment Variable Setup
+
+After deployment, you need to set secret environment variables:
 
 1. **Go to your DigitalOcean Dashboard:**
    https://cloud.digitalocean.com/apps/93a8fcec-94b3-4c24-9c7f-3b23c6b37b5c
 
-2. **Navigate to Settings → api → Environment Variables**
+2. **Navigate to Settings → api component → Environment Variables**
 
-3. **Add/Update these environment variables:**
+3. **Add these SECRET environment variables:**
    ```
-   DATABASE_URL = postgresql://doadmin:[YOUR_PASSWORD]@private-db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com:25060/defaultdb?sslmode=require
    JWT_SECRET = [GENERATE_A_SECURE_SECRET]
    JWT_REFRESH_SECRET = [GENERATE_A_DIFFERENT_SECURE_SECRET]
-   NODE_ENV = production
-   PORT = 3001
-   PENTEST_TOOLS_API_KEY = [YOUR_API_KEY]
-   PENTEST_TOOLS_API_URL = https://app.pentest-tools.com/api/v2
-   CORS_ORIGIN = https://securityscan.cobytes.com
+   SESSION_SECRET = [GENERATE_ANOTHER_SECURE_SECRET]
+   
+   # MultiSafepay Integration (get from MultiSafepay dashboard)
+   MULTISAFEPAY_API_KEY = [YOUR_MULTISAFEPAY_API_KEY]
+   MULTISAFEPAY_SITE_ID = [YOUR_MULTISAFEPAY_SITE_ID]
+   MULTISAFEPAY_SITE_CODE = [YOUR_MULTISAFEPAY_SITE_CODE]
    ```
 
-4. **Remove any 'SKIP_DB' variable if it exists**
+4. **Verify these environment variables are present:**
+   ```
+   DATABASE_URL = ${cobytes-db.DATABASE_URL}
+   NODE_ENV = production
+   PORT = 3001
+   PENTEST_TOOLS_API_KEY = 43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7
+   PENTEST_TOOLS_API_URL = https://app.pentest-tools.com/api/v2
+   CORS_ORIGIN = https://securityscan.cobytes.com,http://localhost:3000
+   HOSTFACT_API_KEY = 6685741463b3d6791e31779df6a99a92
+   HOSTFACT_URL = https://secure.cobytes.com/Pro/apiv2/api.php
+   ```
 
 5. **Click 'Save'**
 
@@ -31,21 +58,46 @@ The DigitalOcean MCP API does not support updating environment variables program
 
 ## What Will Happen:
 
-- The app will pull the latest code from GitHub
-- The backend will build with TypeScript path resolution fixed
-- The SSL certificate for database connection is embedded in the Docker image
+- The app will pull the latest code from GitHub with e-commerce features
+- Backend includes complete payment integration (MultiSafepay + HostFact)
+- Frontend has shopping cart, checkout flow, and product catalog
 - TypeORM will connect to your managed PostgreSQL database
-- Tables will be auto-created on first run
+- New tables for products, cart, orders will be auto-created
 - The app will be available at https://securityscan.cobytes.com
 
-## Database Connection Details:
+## 🌐 Production URLs:
 
-- Host (public): db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com
-- Host (private): private-db-securityscan-ams3-do-user-170668-0.k.db.ondigitalocean.com
-- Port: 25060
-- Database: defaultdb
-- SSL: Required (certificate embedded in Docker image)
+- **Frontend**: https://securityscan.cobytes.com
+- **API Health**: https://api.securityscan.cobytes.com/health
+- **Products API**: https://api.securityscan.cobytes.com/api/products
 
-## Monitor Deployment:
+## 📊 Monitor Deployment:
 
-Check the Activity tab in DigitalOcean dashboard to monitor deployment progress and view logs.
+1. **Check deployment status:**
+   ```bash
+   doctl apps list-deployments 93a8fcec-94b3-4c24-9c7f-3b23c6b37b5c
+   ```
+
+2. **View logs:**
+   ```bash
+   doctl apps logs 93a8fcec-94b3-4c24-9c7f-3b23c6b37b5c
+   ```
+
+3. **Or use DigitalOcean Dashboard:**
+   Check the Activity tab to monitor deployment progress
+
+## ✅ Post-Deployment Verification:
+
+1. Visit https://securityscan.cobytes.com
+2. Click "View Products" - should show 8 security products
+3. Add items to cart
+4. Proceed to checkout
+5. Test the billing form
+6. Verify payment integration redirects to MultiSafepay
+
+## 🚨 Troubleshooting:
+
+- **If frontend shows "Error loading products"**: Check API environment variables
+- **If API returns 404**: Verify ingress rules and API routes prefix
+- **If cart doesn't persist**: Check SESSION_SECRET is set
+- **If payment fails**: Verify MultiSafepay credentials are correct

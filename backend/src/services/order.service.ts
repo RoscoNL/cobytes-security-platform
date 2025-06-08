@@ -5,6 +5,7 @@ import { Cart } from '../models/cart.model';
 import { User } from '../models/user.model';
 import cartService from './cart.service';
 import multisafepayService from './multisafepay.service';
+import couponService from './coupon.service';
 import { logger } from '../utils/logger';
 
 interface CreateOrderDto {

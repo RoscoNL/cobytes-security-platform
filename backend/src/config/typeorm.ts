@@ -8,6 +8,8 @@ import { Cart } from '../models/cart.model';
 import { CartItem } from '../models/cartItem.model';
 import { Order } from '../models/order.model';
 import { OrderItem } from '../models/orderItem.model';
+import { Coupon } from '../models/coupon.model';
+import { CouponUsage } from '../models/couponUsage.model';
 import { logger } from '../utils/logger';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -57,7 +59,7 @@ export const AppDataSource = new DataSource({
   ...getDatabaseConfig(),
   synchronize: true, // Always synchronize to ensure tables exist
   logging: process.env.NODE_ENV === 'development',
-  entities: [User, Scan, ScanResult, ScheduledScan, Product, Cart, CartItem, Order, OrderItem],
+  entities: [User, Scan, ScanResult, ScheduledScan, Product, Cart, CartItem, Order, OrderItem, Coupon, CouponUsage],
   migrations: ['src/migrations/*.ts'],
   subscribers: ['src/subscribers/*.ts'],
 });
