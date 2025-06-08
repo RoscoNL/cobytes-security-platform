@@ -56,6 +56,24 @@ services:
       - key: REDIS_URL
         value: "redis://localhost:6379"
         scope: RUN_TIME
+      - key: MULTISAFEPAY_API_KEY
+        type: SECRET
+        scope: RUN_TIME
+      - key: MULTISAFEPAY_SITE_ID
+        type: SECRET
+        scope: RUN_TIME
+      - key: MULTISAFEPAY_SITE_CODE
+        type: SECRET
+        scope: RUN_TIME
+      - key: HOSTFACT_API_KEY
+        value: "6685741463b3d6791e31779df6a99a92"
+        scope: RUN_TIME
+      - key: HOSTFACT_URL
+        value: "https://secure.cobytes.com/Pro/apiv2/api.php"
+        scope: RUN_TIME
+      - key: SESSION_SECRET
+        type: SECRET
+        scope: RUN_TIME
     
 static_sites:
   - name: frontend
@@ -69,7 +87,10 @@ static_sites:
     catchall_document: index.html
     envs:
       - key: REACT_APP_API_URL
-        value: "https://api.securityscan.cobytes.com"
+        value: "https://api.securityscan.cobytes.com/api"
+        scope: BUILD_TIME
+      - key: REACT_APP_WS_URL
+        value: "wss://api.securityscan.cobytes.com"
         scope: BUILD_TIME
       - key: NODE_ENV
         value: production
