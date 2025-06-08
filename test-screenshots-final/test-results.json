@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-06-08T14:02:09.121Z",
+  "tests": [
+    {
+      "name": "Homepage Access",
+      "status": "success",
+      "message": "Homepage loaded successfully"
+    },
+    {
+      "name": "Free Scan Feature",
+      "status": "failed",
+      "message": "URL input field not found"
+    },
+    {
+      "name": "Login",
+      "status": "failed",
+      "message": "Login failed - still on login page"
+    }
+  ]
+}

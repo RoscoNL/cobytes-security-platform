@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { io, Socket } from 'socket.io-client';
 import { pentestToolsProxyService, ProxyPentestToolId } from './pentesttools-proxy.service';
+import pentestToolsDirectService from './pentesttools-direct.service';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
@@ -188,6 +189,61 @@ class ScanService {
   // PentestTools integration
   async createPentestToolsScan(toolId: number, target: string, params: any = {}): Promise<any> {
     try {
+      // Use direct CORS API
+      console.log('Creating PentestTools scan via direct CORS...');
+      
+      // Create or get target
+      let targetId;
+      try {
+        const targets = await pentestToolsDirectService.getTargets();
+        const existingTarget = targets.find(t => t.name === target);
+        
+        if (existingTarget) {
+          targetId = existingTarget.id;
+        } else {
+          const newTarget = await pentestToolsDirectService.createTarget(target);
+          targetId = newTarget.id;
+        }
+      } catch (err) {
+        console.log('Using target_name parameter instead of target_id');
+      }
+
+      // Start the scan
+      const scanOptions = {
+        tool_id: toolId,
+        target_name: target,
+        target_id: targetId,
+        tool_params: params
+      };
+
+      const { scan_id } = await pentestToolsDirectService.startScan(scanOptions);
+      
+      // Return scan info for tracking
+      return {
+        id: scan_id,
+        target,
+        type: `pentest_tool_${toolId}`,
+        status: 'running',
+        progress: 0,
+        parameters: params,
+        pentestToolsScanId: scan_id
+      };
+    } catch (error: any) {
+      console.error('Failed to create PentestTools scan:', error);
+      
+      // Fallback to proxy if direct CORS fails
+      if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+        console.log('Direct CORS failed, falling back to proxy...');
+        return this.createPentestToolsScanViaProxy(toolId, target, params);
+      }
+      
+      throw error;
+    }
+  }
+
+  // Fallback method using proxy
+  private async createPentestToolsScanViaProxy(toolId: number, target: string, params: any = {}): Promise<any> {
+    try {
       // Create or get target
       let targetId;
       try {
@@ -225,7 +281,7 @@ class ScanService {
         pentestToolsScanId: scan_id
       };
     } catch (error: any) {
-      console.error('Failed to create PentestTools scan:', error);
+      console.error('Failed to create PentestTools scan via proxy:', error);
       throw error;
     }
   }

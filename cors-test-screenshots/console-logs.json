@@ -1,0 +1,40 @@
+{
+  "consoleLogs": [
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[warn] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+    "[warn] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.",
+    "[log] [5:38:54 PM] Starting WordPress Scanner scan for https://www.cobytes.com",
+    "[log] [5:38:54 PM] Tool ID: 270",
+    "[log] [5:38:54 PM] Creating target...",
+    "[log] [5:38:54 PM] Making CORS request to: https://app.pentest-tools.com/api/v2/targets",
+    "[error] Access to fetch at 'https://app.pentest-tools.com/api/v2/targets' from origin 'http://localhost:3002' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: The 'Access-Control-Allow-Origin' header contains multiple values '*, *', but only one is allowed. Have the server send the header with a valid value.",
+    "[error] Failed to load resource: net::ERR_FAILED",
+    "[log] [5:38:54 PM] ❌ Request failed: Failed to fetch",
+    "[log] [5:38:54 PM] ⚠️  Could not create target, will use target_name parameter",
+    "[log] [5:38:54 PM] Starting scan...",
+    "[log] [5:38:54 PM] Scan payload: {\"tool_id\":270,\"target_name\":\"https://www.cobytes.com\",\"tool_params\":{}}",
+    "[log] [5:38:54 PM] Making CORS request to: https://app.pentest-tools.com/api/v2/scans",
+    "[error] Access to fetch at 'https://app.pentest-tools.com/api/v2/scans' from origin 'http://localhost:3002' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: The 'Access-Control-Allow-Origin' header contains multiple values '*, *', but only one is allowed. Have the server send the header with a valid value.",
+    "[error] Failed to load resource: net::ERR_FAILED",
+    "[log] [5:38:54 PM] ❌ Request failed: Failed to fetch",
+    "[error] Scan error: JSHandle@error",
+    "[log] [5:38:54 PM] ❌ Error: Failed to fetch",
+    "[log] [5:38:54 PM] 🔍 This might be a CORS issue. Check browser console for details."
+  ],
+  "networkErrors": [
+    {
+      "url": "https://app.pentest-tools.com/api/v2/targets",
+      "failure": {
+        "errorText": "net::ERR_FAILED"
+      },
+      "method": "POST"
+    },
+    {
+      "url": "https://app.pentest-tools.com/api/v2/scans",
+      "failure": {
+        "errorText": "net::ERR_FAILED"
+      },
+      "method": "POST"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-06-08T14:03:54.424Z",
+  "tests": [
+    {
+      "name": "Frontend Access",
+      "status": "success"
+    },
+    {
+      "name": "Backend API Access",
+      "status": "success"
+    },
+    {
+      "name": "Login",
+      "status": "success"
+    },
+    {
+      "name": "Scan Creation",
+      "status": "success",
+      "scanId": 2
+    },
+    {
+      "name": "Scan Progress Check",
+      "status": "success"
+    },
+    {
+      "name": "Free Scan Page",
+      "status": "warning"
+    }
+  ]
+}

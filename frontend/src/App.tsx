@@ -32,6 +32,10 @@ import OrderPayment from './pages/OrderPayment';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderCancelled from './pages/OrderCancelled';
 import Orders from './pages/Orders';
+import TestDirectCors from './pages/TestDirectCors';
+import DirectPentestTools from './pages/DirectPentestTools';
+import ScanCreate from './pages/ScanCreate';
+import ScanStatusSimple from './pages/ScanStatusSimple';
 import './App.css';
 
 function App() {
@@ -55,12 +59,12 @@ function App() {
             <Route path="/how-to" element={<HowTo />} />
             <Route path="/all-scanners-new" element={<AllScannersNew />} />
             <Route path="/integration-status" element={<IntegrationStatus />} />
-            <Route path="/scan-status/:scanId" element={<ScanStatus />} />
+            <Route path="/scan-status/:scanId" element={<ScanStatusSimple />} />
             <Route path="/scan-demo" element={<FreeScan />} />
             <Route path="/security-dashboard" element={<SecurityDashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/scans" element={<ScanList />} />
-            <Route path="/dashboard/scans/new" element={<ScanNew />} />
+            <Route path="/dashboard/scans/new" element={<ScanCreate />} />
             <Route path="/dashboard/scans/:id" element={<ScanDetail />} />
             <Route path="/dashboard/reports" element={<Reports />} />
             <Route path="/dashboard/scanners" element={<AllScanners />} />
@@ -72,6 +76,8 @@ function App() {
             <Route path="/dashboard/cors-proxy-test" element={<CorsProxyTest />} />
             <Route path="/dashboard/all-scanners" element={<AllScannersNew />} />
             <Route path="/dashboard/integration" element={<IntegrationStatus />} />
+            <Route path="/dashboard/test-direct-cors" element={<TestDirectCors />} />
+            <Route path="/dashboard/direct-pentest" element={<DirectPentestTools />} />
           </Route>
         </Routes>
       </Router>
