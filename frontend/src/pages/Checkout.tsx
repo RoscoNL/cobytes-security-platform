@@ -80,9 +80,16 @@ const Checkout: React.FC = () => {
   const fetchCart = async () => {
     try {
       const response = await api.get('/api/cart');
-      setCart(response.data.data);
-      if (!response.data.data || response.data.data.items.length === 0) {
+      if (response.error) {
+        console.error('Error fetching cart:', response.error);
         navigate('/cart');
+        return;
+      }
+      if (response.data) {
+        setCart(response.data);
+        if (!response.data || response.data.items.length === 0) {
+          navigate('/cart');
+        }
       }
     } catch (error) {
       console.error('Error fetching cart:', error);
@@ -95,12 +102,18 @@ const Checkout: React.FC = () => {
   const fetchUserData = async () => {
     try {
       const response = await api.get('/api/auth/me');
-      const user = response.data.data;
-      setBillingData(prev => ({
-        ...prev,
-        billing_name: user.name || '',
-        billing_email: user.email || '',
-      }));
+      if (response.error) {
+        console.error('Error fetching user data:', response.error);
+        return;
+      }
+      if (response.data) {
+        const user = response.data;
+        setBillingData(prev => ({
+          ...prev,
+          billing_name: user.name || '',
+          billing_email: user.email || '',
+        }));
+      }
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -174,7 +187,13 @@ const Checkout: React.FC = () => {
         cart_id: cart?.id,
       });
       
-      const order = orderResponse.data.data;
+      if (orderResponse.error) {
+        alert(orderResponse.error);
+        setProcessing(false);
+        return;
+      }
+      
+      const order = orderResponse.data;
       
       // Redirect to payment based on method
       if (billingData.payment_method === 'multisafepay') {

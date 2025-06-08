@@ -58,7 +58,11 @@ const Products: React.FC = () => {
   const fetchProducts = async () => {
     try {
       const response = await api.get('/api/products');
-      setProducts(response.data.data);
+      if (response.error) {
+        console.error('Error fetching products:', response.error);
+      } else if (response.data) {
+        setProducts(response.data);
+      }
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -69,7 +73,11 @@ const Products: React.FC = () => {
   const fetchCart = async () => {
     try {
       const response = await api.get('/api/cart');
-      setCart(response.data.data);
+      if (response.error) {
+        console.error('Error fetching cart:', response.error);
+      } else if (response.data) {
+        setCart(response.data);
+      }
     } catch (error) {
       console.error('Error fetching cart:', error);
     }
@@ -81,8 +89,13 @@ const Products: React.FC = () => {
         productId,
         quantity: 1,
       });
-      setCart(response.data.data);
-      // Show success notification
+      if (response.error) {
+        console.error('Error adding to cart:', response.error);
+        alert('Failed to add to cart: ' + response.error);
+      } else if (response.data) {
+        setCart(response.data);
+        // Show success notification
+      }
     } catch (error) {
       console.error('Error adding to cart:', error);
     }

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import scanService from '../services/scan.service';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,6 +15,10 @@ const Login: React.FC = () => {
     name: '',
     company: '',
   });
+
+  // Get redirect URL from query params
+  const searchParams = new URLSearchParams(location.search);
+  const redirectTo = searchParams.get('redirect') || '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +45,7 @@ const Login: React.FC = () => {
         scanService.setToken(token);
         
         console.log('Login successful:', user);
-        navigate('/dashboard');
+        navigate(redirectTo);
       } else {
         // Register
         const response = await axios.post(`${API_URL}/auth/register`, {
@@ -60,15 +65,18 @@ const Login: React.FC = () => {
         scanService.setToken(token);
         
         console.log('Registration successful:', user);
-        navigate('/dashboard');
+        navigate(redirectTo);
       }
     } catch (err: any) {
       console.error('Auth error:', err);
-      setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        'Authentication failed. Please try again.'
-      );
+      // Make sure we're setting a string, not an object
+      const errorMessage = 
+        (typeof err.response?.data?.message === 'string' ? err.response?.data?.message : null) ||
+        (typeof err.response?.data?.error === 'string' ? err.response?.data?.error : null) ||
+        (err.response?.data?.error?.message ? err.response?.data?.error?.message : null) ||
+        (err.message || 'Authentication failed. Please try again.');
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
