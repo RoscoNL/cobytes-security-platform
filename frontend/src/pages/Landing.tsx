@@ -66,42 +66,45 @@ const Landing: React.FC = () => {
       name: 'Quick Scan',
       price: 'Free',
       features: [
-        'Basic vulnerability scan',
-        'SSL certificate check',
-        'Up to 100 pages',
-        'Basic report',
-        'No authentication required',
+        'Basic SSL certificate check',
+        'DNS lookup analysis',
+        'Basic vulnerability detection',
+        'Instant results',
+        'No login required',
       ],
       recommended: false,
-      cta: 'Start Free Scan',
+      cta: 'Try Free Scan',
+      action: () => navigate('/scan-demo'),
     },
     {
       name: 'Professional',
       price: '€49',
       features: [
-        'All scan types available',
+        'All 40+ scan types',
+        'WordPress/Joomla/Drupal scans',
         'Deep vulnerability analysis',
-        'Unlimited pages',
-        'Detailed PDF report',
+        'Detailed PDF reports',
+        'Real-time progress tracking',
         'Priority support',
-        'API access',
       ],
       recommended: true,
-      cta: 'Start Pro Scan',
+      cta: 'View Products',
+      action: () => navigate('/products'),
     },
     {
       name: 'Enterprise',
       price: 'Custom',
       features: [
         'All Professional features',
-        'Scheduled scanning',
+        'Scheduled & recurring scans',
         'Custom integrations',
         'Compliance reporting',
-        'Dedicated support',
+        'Dedicated account manager',
         'SLA guarantee',
       ],
       recommended: false,
       cta: 'Contact Sales',
+      action: () => window.location.href = 'mailto:info@cobytes.nl?subject=Enterprise Security Scanning',
     },
   ];
 
@@ -121,10 +124,10 @@ const Landing: React.FC = () => {
               <a href="#pricing" className="text-gray-700 hover:text-primary-500">Pricing</a>
               <a href="#contact" className="text-gray-700 hover:text-primary-500">Contact</a>
               <button
-                onClick={() => navigate('/dashboard/scans/new')}
+                onClick={() => navigate('/products')}
                 className="bg-primary-500 text-white px-4 py-2 rounded hover:bg-primary-600 transition"
               >
-                Start Scan
+                View Products
               </button>
             </div>
           </div>
@@ -147,16 +150,16 @@ const Landing: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => navigate('/dashboard/scans/new')}
+              onClick={() => navigate('/products')}
               className="bg-primary-500 text-white px-8 py-3 rounded text-lg font-semibold hover:bg-primary-600 transition"
             >
-              Start Free Scan
+              Browse Security Products
             </button>
             <button
-              onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => navigate('/scan-demo')}
               className="bg-transparent border-2 border-white text-white px-8 py-3 rounded text-lg font-semibold hover:bg-white hover:text-gray-900 transition"
             >
-              Learn More
+              Try Free Demo
             </button>
           </div>
         </div>
@@ -316,7 +319,7 @@ const Landing: React.FC = () => {
                 </ul>
 
                 <button
-                  onClick={() => plan.price === 'Custom' ? window.location.href = 'mailto:info@cobytes.nl' : navigate('/dashboard/scans/new')}
+                  onClick={plan.action}
                   className={`w-full py-3 px-4 rounded font-semibold transition ${
                     plan.recommended
                       ? 'bg-primary-500 text-white hover:bg-primary-600'
@@ -341,10 +344,10 @@ const Landing: React.FC = () => {
             Start scanning your digital assets today with no login required
           </p>
           <button
-            onClick={() => navigate('/dashboard/scans/new')}
+            onClick={() => navigate('/products')}
             className="bg-white text-primary-500 px-8 py-3 rounded text-lg font-semibold hover:bg-gray-100 transition"
           >
-            Start Free Scan
+            View Security Products
           </button>
         </div>
       </section>

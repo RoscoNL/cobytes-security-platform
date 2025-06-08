@@ -24,6 +24,13 @@ import ScanStatus from './pages/ScanStatus';
 import ScanDemo from './pages/ScanDemo';
 import SecurityDashboard from './pages/SecurityDashboard';
 import Reports from './pages/Reports';
+import FreeScan from './pages/FreeScan';
+import Products from './pages/Products';
+import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import OrderPayment from './pages/OrderPayment';
+import OrderSuccess from './pages/OrderSuccess';
+import OrderCancelled from './pages/OrderCancelled';
 import './App.css';
 
 function App() {
@@ -34,10 +41,17 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/orders/:orderId/pay" element={<OrderPayment />} />
+          <Route path="/orders/:orderId/success" element={<OrderSuccess />} />
+          <Route path="/orders/:orderId/cancelled" element={<OrderCancelled />} />
+          <Route path="/free-scan" element={<FreeScan />} />
           <Route path="/all-scanners-new" element={<AllScannersNew />} />
           <Route path="/integration-status" element={<IntegrationStatus />} />
           <Route path="/scan-status/:scanId" element={<ScanStatus />} />
-          <Route path="/scan-demo" element={<ScanDemo />} />
+          <Route path="/scan-demo" element={<FreeScan />} />
           <Route path="/security-dashboard" element={<SecurityDashboard />} />
           <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />

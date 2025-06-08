@@ -3,6 +3,11 @@ import { User } from '../models/user.model';
 import { Scan } from '../models/scan.model';
 import { ScanResult } from '../models/scanResult.model';
 import { ScheduledScan } from '../models/scheduledScan.model';
+import { Product } from '../models/product.model';
+import { Cart } from '../models/cart.model';
+import { CartItem } from '../models/cartItem.model';
+import { Order } from '../models/order.model';
+import { OrderItem } from '../models/orderItem.model';
 import { logger } from '../utils/logger';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -52,7 +57,7 @@ export const AppDataSource = new DataSource({
   ...getDatabaseConfig(),
   synchronize: true, // Always synchronize to ensure tables exist
   logging: process.env.NODE_ENV === 'development',
-  entities: [User, Scan, ScanResult, ScheduledScan],
+  entities: [User, Scan, ScanResult, ScheduledScan, Product, Cart, CartItem, Order, OrderItem],
   migrations: ['src/migrations/*.ts'],
   subscribers: ['src/subscribers/*.ts'],
 });

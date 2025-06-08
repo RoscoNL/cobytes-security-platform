@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from './user.model';
 import { ScanResult } from './scanResult.model';
+import { OrderItem } from './orderItem.model';
 
 export enum ScanType {
   // Information Gathering
@@ -92,6 +93,10 @@ export class Scan {
 
   @ManyToOne(() => User, user => user.scans, { nullable: true })
   user: User;
+
+  @ManyToOne(() => OrderItem, orderItem => orderItem.scans, { nullable: true })
+  @JoinColumn()
+  order_item: OrderItem;
 
   @OneToMany(() => ScanResult, result => result.scan)
   results: ScanResult[];

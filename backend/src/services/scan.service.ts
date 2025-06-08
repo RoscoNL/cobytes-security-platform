@@ -2,6 +2,7 @@ import { Scan, ScanStatus, ScanType } from '../models/scan.model';
 import { ScanResult, ResultSeverity } from '../models/scanResult.model';
 import pentestToolsService, { PentestToolId, ScanType as PTScanType } from './pentesttools.service';
 import mockScannerService from './mock-scanner.service';
+import orderService from './order.service';
 import { logger } from '../utils/logger';
 import { getRedis } from '../config/redis';
 import { AppDataSource } from '../config/typeorm';
@@ -39,6 +40,20 @@ class ScanService {
   }
 
   async createScan(data: CreateScanDto): Promise<Scan> {
+    // Check if user has available scans (skip for free/demo scans)
+    if (data.userId && data.type !== ScanType.SSL && data.type !== ScanType.DNS_LOOKUP) {
+      try {
+        const orderItem = await orderService.consumeScan(data.userId, data.type);
+        logger.info('Scan consumed from order', { 
+          userId: data.userId, 
+          scanType: data.type,
+          orderItemId: orderItem.id 
+        });
+      } catch (error) {
+        logger.error('Failed to consume scan from order', { error });
+        throw new Error('No available scans. Please purchase a scan package.');
+      }
+    }
     // Mock implementation when database is disabled
     if (process.env.SKIP_DB === 'true') {
       const mockScan = {
@@ -69,7 +84,8 @@ class ScanService {
       type: data.type,
       parameters: data.parameters,
       status: ScanStatus.PENDING,
-      user: data.userId ? { id: data.userId } : undefined
+      user: data.userId ? { id: data.userId } : undefined,
+      // Note: order_item relationship is set separately when consuming scan
     });
 
     await this.scanRepository!.save(scan);
@@ -169,8 +185,8 @@ class ScanService {
         await this.scanRepository!.save(scan);
       }
 
-      // Use mock scanner in development or if configured
-      const useMockScanner = process.env.NODE_ENV === 'development' || process.env.USE_MOCK_SCANNER === 'true';
+      // Use mock scanner only if explicitly configured
+      const useMockScanner = process.env.USE_MOCK_SCANNER === 'true';
       
       if (useMockScanner) {
         logger.info('Using mock scanner for scan', { scanId, type: scan.type });

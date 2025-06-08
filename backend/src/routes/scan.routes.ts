@@ -8,6 +8,10 @@ const router = Router();
 // Public endpoints - no auth required
 router.get('/scan-types', scanController.getScanTypes);
 
+// Free scan endpoints - no auth required
+router.post('/free', scanController.createFreeScan);
+router.get('/free/:id', scanController.getFreeScan);
+
 // Mixed auth endpoints - auth optional but provides user context
 router.post('/', optionalAuth, scanController.createScan);
 router.get('/:id', optionalAuth, scanController.getScan);

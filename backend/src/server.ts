@@ -12,12 +12,14 @@ import { errorHandler } from '@middleware/errorHandler';
 import { notFoundHandler } from '@middleware/notFoundHandler';
 import { requestLogger } from '@middleware/requestLogger';
 import corsMiddleware from '@middleware/cors';
+import { sessionMiddleware } from '@middleware/session';
 import { configureRoutes } from '@routes/index';
 import { logger } from '@utils/logger';
 import { initializeDatabase } from '@config/typeorm';
 import { connectRedis } from '@config/redis';
 import WebSocketService from '@services/websocket.service';
 import schedulerService from '@services/scheduler.service';
+import productService from '@services/product.service';
 
 // Create Express application
 const app: Application = express();
@@ -34,6 +36,9 @@ app.use(morgan('combined', { stream: { write: (message) => logger.info(message.t
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Session middleware - temporarily disabled
+// app.use(sessionMiddleware);
 
 // Custom middleware
 app.use(requestLogger);
@@ -53,6 +58,9 @@ const startServer = async () => {
     // Connect to databases
     await initializeDatabase();
     await connectRedis();
+    
+    // Initialize services
+    await productService.initializeProducts();
     
     // Initialize WebSocket service
     const wsService = new WebSocketService(httpServer);

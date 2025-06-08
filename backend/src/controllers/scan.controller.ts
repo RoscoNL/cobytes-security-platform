@@ -3,6 +3,9 @@ import scanService from '../services/scan.service';
 import { ScanType } from '../models/scan.model';
 import { logger } from '../utils/logger';
 
+// Store free scans in memory (in production, use Redis or database)
+const freeScans = new Map<string, any>();
+
 export class ScanController {
   // Get all available scan types and their options
   async getScanTypes(req: Request, res: Response) {
@@ -504,6 +507,95 @@ export class ScanController {
       logger.error('Failed to delete scan', { error });
       res.status(500).json({
         error: 'Failed to delete scan',
+        message: error.message
+      });
+    }
+  }
+
+  // Create a free scan (SSL only, no auth required)
+  async createFreeScan(req: Request, res: Response) {
+    try {
+      const { target } = req.body;
+      
+      if (!target) {
+        return res.status(400).json({ error: 'Target URL is required' });
+      }
+
+      // Validate URL
+      try {
+        new URL(target);
+      } catch {
+        return res.status(400).json({ error: 'Invalid URL format' });
+      }
+
+      // Free scans are limited to SSL checks
+      const scanData = {
+        target,
+        type: ScanType.SSL,
+        parameters: {},
+        // No userId for free scans
+      };
+
+      const scan = await scanService.createScan(scanData);
+      
+      // Store in memory for retrieval
+      freeScans.set(scan.id.toString(), scan);
+
+      res.status(201).json({
+        success: true,
+        data: {
+          id: scan.id,
+          target: scan.target,
+          type: scan.type,
+          status: scan.status,
+          progress: scan.progress
+        }
+      });
+    } catch (error: any) {
+      logger.error('Failed to create free scan', { error });
+      res.status(500).json({
+        error: 'Failed to create scan',
+        message: error.message
+      });
+    }
+  }
+
+  // Get free scan status (no auth required)
+  async getFreeScan(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      
+      // First check memory
+      let scan = freeScans.get(id);
+      
+      // If not in memory, try to get from service
+      if (!scan) {
+        scan = await scanService.getScan(parseInt(id));
+      }
+      
+      if (!scan) {
+        return res.status(404).json({ error: 'Scan not found' });
+      }
+
+      // Only return limited data for free scans
+      res.json({
+        success: true,
+        data: {
+          id: scan.id,
+          target: scan.target,
+          type: scan.type,
+          status: scan.status,
+          progress: scan.progress,
+          results: scan.results,
+          error_message: scan.error_message,
+          created_at: scan.created_at,
+          completed_at: scan.completed_at
+        }
+      });
+    } catch (error: any) {
+      logger.error('Failed to get free scan', { error });
+      res.status(500).json({
+        error: 'Failed to get scan',
         message: error.message
       });
     }
