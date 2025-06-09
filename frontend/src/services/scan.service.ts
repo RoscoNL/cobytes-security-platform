@@ -63,12 +63,15 @@ class ScanService {
   }
 
   private getHeaders() {
+    // Always get fresh token from localStorage
+    const currentToken = localStorage.getItem('token');
     const headers: any = {
       'Content-Type': 'application/json',
     };
     
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+    if (currentToken) {
+      headers['Authorization'] = `Bearer ${currentToken}`;
+      this.token = currentToken; // Update instance token
     }
     
     return headers;

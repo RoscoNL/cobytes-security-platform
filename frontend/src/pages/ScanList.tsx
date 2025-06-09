@@ -103,6 +103,15 @@ const ScanList: React.FC = () => {
       setLoading(true);
       setError(null);
       
+      // Check if user is authenticated
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Please log in to view your scans.');
+        setScans([]);
+        setLoading(false);
+        return;
+      }
+      
       // Load backend scans
       const backendScans = await scanService.getAllScans();
       setScans(backendScans);
@@ -123,7 +132,12 @@ const ScanList: React.FC = () => {
       
     } catch (err: any) {
       console.error('Failed to load scans:', err);
-      if (err.response?.status !== 401) {
+      if (err.response?.status === 401) {
+        setError('Your session has expired. Please log in again.');
+        // Optionally redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } else {
         setError('Failed to load scans. Please try again.');
       }
       setScans([]);

@@ -25,6 +25,7 @@ import ScanDemo from './pages/ScanDemo';
 import SecurityDashboard from './pages/SecurityDashboard';
 import Reports from './pages/Reports';
 import FreeScan from './pages/FreeScan';
+import ScanDemoWorking from './pages/ScanDemoWorking';
 import Products from './pages/Products';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -60,7 +61,7 @@ function App() {
             <Route path="/all-scanners-new" element={<AllScannersNew />} />
             <Route path="/integration-status" element={<IntegrationStatus />} />
             <Route path="/scan-status/:scanId" element={<ScanStatusSimple />} />
-            <Route path="/scan-demo" element={<FreeScan />} />
+            <Route path="/scan-demo" element={<ScanDemoWorking />} />
             <Route path="/security-dashboard" element={<SecurityDashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/scans" element={<ScanList />} />
