@@ -44,7 +44,32 @@ async function testPlatform() {
 
     // Test 2: Click View Products
     console.log('\n📍 Test 2: Products Page');
-    await page.click('button:has-text("View Products")');
+    
+    // Try clicking the first visible "View Products" button
+    try {
+      // Use evaluate to find and click the button within the page context
+      const clicked = await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const viewProductsButton = buttons.find(btn => 
+          btn.textContent?.includes('View Products') && 
+          window.getComputedStyle(btn).display !== 'none'
+        );
+        if (viewProductsButton) {
+          viewProductsButton.click();
+          return true;
+        }
+        return false;
+      });
+      
+      if (!clicked) {
+        // If no button found, navigate directly
+        await page.goto(`${FRONTEND_URL}/products`);
+      }
+    } catch (error) {
+      console.log('⚠️  Could not click View Products button, navigating directly');
+      await page.goto(`${FRONTEND_URL}/products`);
+    }
+    
     await delay(2000);
     
     // Check if we're on products or login page
@@ -71,9 +96,17 @@ async function testPlatform() {
     console.log('\n📍 Test 3: Cart Functionality');
     if (products.length > 0) {
       // Click first "Add to Cart" button
-      const addToCartButtons = await page.$$('button:has-text("Add to Cart")');
-      if (addToCartButtons.length > 0) {
-        await addToCartButtons[0].click();
+      const addToCartButtons = await page.$$('button');
+      let cartButton = null;
+      for (const button of addToCartButtons) {
+        const text = await button.evaluate(el => el.textContent);
+        if (text && text.includes('Add to Cart')) {
+          cartButton = button;
+          break;
+        }
+      }
+      if (cartButton) {
+        await cartButton.click();
         await delay(1000);
         console.log('✅ Added product to cart');
       }
@@ -82,9 +115,17 @@ async function testPlatform() {
     // Test 4: Go to Cart
     console.log('\n📍 Test 4: View Cart');
     // Check if cart button exists in navigation
-    const cartButton = await page.$('button:has-text("Cart")');
-    if (cartButton) {
-      await cartButton.click();
+    const navButtons = await page.$$('button');
+    let navCartButton = null;
+    for (const button of navButtons) {
+      const text = await button.evaluate(el => el.textContent);
+      if (text && text.includes('Cart')) {
+        navCartButton = button;
+        break;
+      }
+    }
+    if (navCartButton) {
+      await navCartButton.click();
     } else {
       await page.goto(`${FRONTEND_URL}/cart`);
     }
@@ -101,7 +142,15 @@ async function testPlatform() {
       await delay(1000);
       
       // Check if register link exists
-      const registerLink = await page.$('a:has-text("Create account")');
+      const links = await page.$$('a');
+      let registerLink = null;
+      for (const link of links) {
+        const text = await link.evaluate(el => el.textContent);
+        if (text && text.includes('Create account')) {
+          registerLink = link;
+          break;
+        }
+      }
       if (registerLink) {
         await registerLink.click();
         await delay(1000);
@@ -141,7 +190,15 @@ async function testPlatform() {
 
     // Test 7: New Scan
     console.log('\n📍 Test 7: Start New Scan');
-    const startScanButton = await page.$('button:has-text("Start Scan")');
+    const scanButtons = await page.$$('button');
+    let startScanButton = null;
+    for (const button of scanButtons) {
+      const text = await button.evaluate(el => el.textContent);
+      if (text && text.includes('Start Scan')) {
+        startScanButton = button;
+        break;
+      }
+    }
     if (startScanButton) {
       await startScanButton.click();
     } else {
@@ -194,7 +251,14 @@ async function testPlatform() {
 
   } catch (error) {
     console.error('\n❌ Test failed:', error.message);
-    await page.screenshot({ path: 'screenshots/error-state.png' });
+    try {
+      const pages = await browser.pages();
+      if (pages.length > 0) {
+        await pages[0].screenshot({ path: 'screenshots/error-state.png' });
+      }
+    } catch (screenshotError) {
+      console.error('Failed to take error screenshot:', screenshotError.message);
+    }
   } finally {
     await browser.close();
   }

@@ -1,0 +1,28 @@
+COBYTES WORDPRESS SECURITY SCAN REPORT
+======================================
+
+Target: https://www.cobytes.com
+Scan Type: wordpress
+Status: completed
+Created: 6/9/2025, 11:46:24 AM
+Completed: 6/9/2025, 1:46:46 PM
+
+FINDINGS
+--------
+
+1. WordPress Version Disclosure
+   Severity: low
+   Description: WordPress version 6.3.1 detected
+   Recommendation: Consider hiding version information
+
+2. Admin Login Page Accessible
+   Severity: medium
+   Description: WordPress admin login page is publicly accessible
+   Recommendation: Implement IP whitelisting or additional authentication
+
+SUMMARY
+-------
+Total Findings: 2
+Scan Duration: 7222 seconds
+
+Generated on: 6/9/2025, 1:50:15 PM

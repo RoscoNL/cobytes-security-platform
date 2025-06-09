@@ -91,13 +91,13 @@ const Layout: React.FC = () => {
 
   const authenticatedMenuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', highlight: false },
-    { text: 'Start New Scan', icon: <StartScanIcon />, path: '/dashboard/scans/new', highlight: true },
+    { text: 'Start New Scan', icon: <StartScanIcon />, path: '/scans/new', highlight: true },
     { text: 'divider', icon: null, path: '', highlight: false },
-    { text: 'My Scans', icon: <AssessmentIcon />, path: '/dashboard/scans', highlight: false },
-    { text: 'Scan Reports', icon: <DownloadIcon />, path: '/dashboard/reports', highlight: false },
+    { text: 'My Scans', icon: <AssessmentIcon />, path: '/scans', highlight: false },
+    { text: 'Scan Reports', icon: <DownloadIcon />, path: '/reports', highlight: false },
     { text: 'divider', icon: null, path: '', highlight: false },
     { text: 'Security Overview', icon: <SecurityIcon />, path: '/security-dashboard', highlight: false },
-    { text: 'All Scanners', icon: <ScannerIcon />, path: '/dashboard/scanners', highlight: false },
+    { text: 'All Scanners', icon: <ScannerIcon />, path: '/scan-demo', highlight: false },
     { text: 'divider', icon: null, path: '', highlight: false },
     { text: 'My Orders', icon: <OrdersIcon />, path: '/orders', highlight: false },
   ];
@@ -193,6 +193,7 @@ const Layout: React.FC = () => {
             edge="start"
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { md: 'none' } }}
+            data-testid="mobile-menu-button"
           >
             <MenuIcon />
           </IconButton>

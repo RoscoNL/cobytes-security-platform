@@ -28,7 +28,7 @@ const OrderPayment: React.FC = () => {
 
   const initializePayment = async () => {
     try {
-      const response = await api.post(`/api/orders/${orderId}/payment/initialize`);
+      const response = await api.post(`/orders/${orderId}/payment/initialize`);
       const { paymentUrl: url, invoiceCode } = response.data.data;
       
       if (url) {

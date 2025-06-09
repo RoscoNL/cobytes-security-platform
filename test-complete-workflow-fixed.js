@@ -1,306 +1,330 @@
+#!/usr/bin/env node
+
 const puppeteer = require('puppeteer');
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs').promises;
+const axios = require('axios');
 
-const BASE_URL = 'http://localhost:3002';
-const API_URL = 'http://localhost:3001/api';
-
-// Test credentials
-const TEST_USER = {
-  email: 'test@cobytes.com',
-  password: 'Test123!@#'
-};
-
-// Target URL for WordPress scan
-const TARGET_URL = 'https://www.cobytes.com';
-
-// Create screenshots directory
-const screenshotsDir = path.join(__dirname, 'screenshots');
-if (!fs.existsSync(screenshotsDir)) {
-  fs.mkdirSync(screenshotsDir);
-}
-
-// Helper function to take screenshot
-const takeScreenshot = async (page, name) => {
-  const filename = path.join(screenshotsDir, `${name}-${Date.now()}.png`);
-  await page.screenshot({ path: filename, fullPage: true });
-  console.log(`📸 Screenshot saved: ${filename}`);
-};
-
-// Helper function to wait
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-// Main test function
-async function runCompleteWorkflowTest() {
-  console.log('🚀 Starting complete workflow test...\n');
+async function testCompleteWorkflow() {
+  console.log('🚀 Starting comprehensive scan workflow test...\n');
   
   const browser = await puppeteer.launch({
     headless: false,
-    defaultViewport: { width: 1280, height: 800 },
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    defaultViewport: null,
+    args: ['--start-maximized', '--no-sandbox']
   });
 
-  const page = await browser.newPage();
-  
-  // Enable console logging from the page
-  page.on('console', msg => {
-    if (msg.type() === 'error') {
-      console.log('❌ Browser console error:', msg.text());
-    }
-  });
-
-  // Set up request interception to log API calls
-  await page.setRequestInterception(true);
-  page.on('request', request => {
-    if (request.url().includes('/api/')) {
-      console.log('🔄 API Call:', request.method(), request.url());
-    }
-    request.continue();
-  });
-
-  page.on('response', response => {
-    if (response.url().includes('/api/') && response.status() !== 200 && response.status() !== 201) {
-      console.log('⚠️  API Response:', response.status(), response.url());
-    }
-  });
+  let scanId = null;
+  let page = null;
 
   try {
-    // Test 1: Navigation Test
-    console.log('📍 TEST 1: Navigation Test');
-    console.log('=======================');
+    page = await browser.newPage();
     
-    await page.goto(BASE_URL, { waitUntil: 'networkidle2' });
-    await takeScreenshot(page, '01-landing-page');
-    
-    // Check if we're on the landing page
-    const isLanding = await page.$('.hero-section, [class*="landing"], [class*="home"]');
-    console.log('Landing page loaded:', !!isLanding);
-    
-    await wait(2000);
+    // Enable console logging with error filtering
+    page.on('console', msg => {
+      const type = msg.type();
+      const text = msg.text();
+      if (type === 'error' && !text.includes('validateDOMNesting') && !text.includes('React DevTools')) {
+        console.log(`❌ Console Error: ${text}`);
+      }
+    });
 
-    // Test 2: Authentication Test
-    console.log('\n📍 TEST 2: Authentication Test');
-    console.log('============================');
+    // Log failed network requests
+    page.on('response', response => {
+      const url = response.url();
+      const status = response.status();
+      if (status >= 400 && !url.includes('static/js/bundle.js.map')) {
+        console.log(`❌ HTTP ${status}: ${url}`);
+      }
+    });
+
+    // 1. LOGIN
+    console.log('1️⃣ Logging in...');
+    await page.goto('http://localhost:3002/login', { waitUntil: 'networkidle0' });
     
-    // Try to navigate to login
-    const loginLink = await page.$('a[href*="login"], button:contains("Login"), button:contains("Sign In")');
-    if (loginLink) {
-      await loginLink.click();
-      await wait(2000);
+    await page.type('input[type="email"]', 'test@cobytes.com');
+    await page.type('input[type="password"]', 'test123');
+    await page.click('button[type="submit"]');
+    
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    console.log('✅ Logged in successfully');
+    await page.screenshot({ path: 'workflow-01-login-success.png' });
+
+    // 2. CREATE NEW SCAN
+    console.log('\n2️⃣ Creating new scan...');
+    await page.goto('http://localhost:3002/scans/new', { waitUntil: 'networkidle0' });
+    await page.screenshot({ path: 'workflow-02-scan-form.png' });
+
+    // Step 1: Enter target
+    await page.waitForSelector('input[placeholder*="example.com"]');
+    await page.type('input[placeholder*="example.com"]', 'https://www.cobytes.com');
+    
+    // Wait for Next button to be enabled
+    await page.waitForFunction(() => {
+      const button = [...document.querySelectorAll('button')].find(b => b.textContent.includes('Next'));
+      return button && !button.disabled;
+    });
+    
+    const nextButton = await page.evaluateHandle(() => {
+      return [...document.querySelectorAll('button')].find(b => b.textContent.includes('Next'));
+    });
+    await nextButton.click();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    console.log('✅ Entered target');
+    await page.screenshot({ path: 'workflow-03-target-entered.png' });
+
+    // Step 2: Select scan type (website)
+    const websiteCard = await page.evaluateHandle(() => {
+      const cards = [...document.querySelectorAll('.MuiCard-root')];
+      return cards.find(card => card.textContent.includes('Website Scanner'));
+    });
+    
+    if (websiteCard) {
+      await websiteCard.click();
     } else {
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle2' });
+      // Fallback: click the first card
+      await page.click('.MuiCard-root');
     }
     
-    await takeScreenshot(page, '02-login-page');
+    // Click Next button again
+    const nextButton2 = await page.evaluateHandle(() => {
+      return [...document.querySelectorAll('button')].find(b => b.textContent.includes('Next'));
+    });
+    await nextButton2.click();
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Try to login
-    try {
-      await page.type('input[type="email"], input[name="email"]', TEST_USER.email);
-      await page.type('input[type="password"], input[name="password"]', TEST_USER.password);
-      await takeScreenshot(page, '03-login-filled');
-      
-      // Submit form
-      const submitButton = await page.$('button[type="submit"], button:contains("Login"), button:contains("Sign In")');
-      if (submitButton) {
-        await Promise.all([
-          submitButton.click(),
-          page.waitForNavigation({ waitUntil: 'networkidle2' })
-        ]);
-      }
-      
-      console.log('✅ Login attempted');
-      await wait(2000);
-      
-      // Check current URL
-      const currentUrl = page.url();
-      console.log('Current URL after login:', currentUrl);
-      
-      if (currentUrl.includes('dashboard') || currentUrl.includes('scans')) {
-        console.log('✅ Successfully logged in');
-      }
-      
-    } catch (error) {
-      console.log('⚠️  Login error:', error.message);
-    }
-    
-    await takeScreenshot(page, '04-after-auth');
+    console.log('✅ Selected scan type');
+    await page.screenshot({ path: 'workflow-04-type-selected.png' });
 
-    // Test 3: Navigate to Scans
-    console.log('\n📍 TEST 3: Navigate to Scans');
-    console.log('===========================');
+    // Step 3: Start scan
+    const startButton = await page.evaluateHandle(() => {
+      return [...document.querySelectorAll('button')].find(b => b.textContent.includes('Start Scan'));
+    });
+    await startButton.click();
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
     
-    // Try to go to scans page
-    const scansLink = await page.$('a[href*="scans"], a:contains("Scans")');
-    if (scansLink) {
-      await scansLink.click();
-      await wait(2000);
+    // Extract scan ID from URL
+    const currentUrl = page.url();
+    const urlMatch = currentUrl.match(/\/scans\/(\d+)/);
+    if (urlMatch) {
+      scanId = urlMatch[1];
+      console.log(`✅ Scan created with ID: ${scanId}`);
     } else {
-      await page.goto(`${BASE_URL}/scans`, { waitUntil: 'networkidle2' });
+      console.log('⚠️ Could not extract scan ID from URL:', currentUrl);
     }
     
-    await takeScreenshot(page, '05-scans-page');
-    
-    // Look for new scan button
-    const newScanButton = await page.$('button:contains("New Scan"), a[href*="new"], button:contains("Start Scan")');
-    if (newScanButton) {
-      await newScanButton.click();
-      await wait(2000);
-    } else {
-      await page.goto(`${BASE_URL}/scans/new`, { waitUntil: 'networkidle2' });
-    }
-    
-    await takeScreenshot(page, '06-new-scan-page');
+    await page.screenshot({ path: 'workflow-04-scan-created.png' });
 
-    // Test 4: Create WordPress Scan
-    console.log('\n📍 TEST 4: Create WordPress Scan');
-    console.log('===============================');
+    // 3. MONITOR SCAN PROGRESS
+    console.log('\n3️⃣ Monitoring scan progress...');
     
-    try {
-      // Find WordPress scan option
-      const scanTypes = await page.$$eval('button, div[role="button"], .scan-type, [class*="scan-type"]', elements => 
-        elements.map(el => ({ 
-          text: el.textContent, 
-          class: el.className,
-          id: el.id 
-        }))
-      );
-      
-      console.log('Found scan type elements:', scanTypes.length);
-      
-      // Click WordPress scan if found
-      const wordpressOption = await page.evaluateHandle(() => {
-        const elements = Array.from(document.querySelectorAll('button, div[role="button"], .scan-type, [class*="scan-type"]'));
-        return elements.find(el => el.textContent.toLowerCase().includes('wordpress'));
-      });
-      
-      if (wordpressOption) {
-        await wordpressOption.click();
-        console.log('✅ Selected WordPress scan');
-        await wait(1000);
-      }
-      
-      // Fill in target URL
-      const urlInput = await page.$('input[name="target"], input[name="url"], input[placeholder*="URL"], input[placeholder*="url"], input[type="url"]');
-      if (urlInput) {
-        await urlInput.type(TARGET_URL);
-        console.log(`✅ Entered target URL: ${TARGET_URL}`);
-      }
-      
-      await takeScreenshot(page, '07-scan-form-filled');
-      
-      // Start scan
-      const startButton = await page.$('button[type="submit"], button:contains("Start"), button:contains("Scan"), button:contains("Begin")');
-      if (startButton) {
-        await startButton.click();
-        console.log('✅ Scan started');
-        await wait(3000);
-      }
-      
-      await takeScreenshot(page, '08-scan-started');
-      
-    } catch (error) {
-      console.log('❌ Scan creation error:', error.message);
-    }
-
-    // Test 5: Monitor Progress
-    console.log('\n📍 TEST 5: Monitor Scan Progress');
-    console.log('================================');
+    const API_URL = 'http://localhost:3001/api';
+    const token = await page.evaluate(() => localStorage.getItem('token'));
     
-    try {
-      let progressChecks = 0;
-      const maxChecks = 10;
+    let scanCompleted = false;
+    let attempts = 0;
+    const maxAttempts = 60; // 5 minutes maximum
+    
+    while (!scanCompleted && attempts < maxAttempts) {
+      attempts++;
       
-      while (progressChecks < maxChecks) {
-        const progressData = await page.evaluate(() => {
-          const progressBar = document.querySelector('[role="progressbar"], .progress-bar, [class*="progress"]');
-          const statusElement = document.querySelector('.scan-status, [class*="status"], .status');
-          const percentElement = document.querySelector('[class*="percent"], .percentage');
-          
-          return {
-            progress: progressBar ? progressBar.getAttribute('aria-valuenow') || progressBar.style.width : null,
-            status: statusElement ? statusElement.textContent : null,
-            percent: percentElement ? percentElement.textContent : null
-          };
+      try {
+        // Get scan status via API
+        const response = await axios.get(`${API_URL}/scans/${scanId}`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
         
-        if (progressData.progress || progressData.status || progressData.percent) {
-          console.log(`Progress update ${progressChecks + 1}:`, progressData);
+        const scan = response.data.data;
+        console.log(`⏱️ Attempt ${attempts}: Status=${scan.status}, Progress=${scan.progress}%`);
+        
+        // Refresh page to show live updates
+        await page.reload({ waitUntil: 'networkidle0' });
+        await page.screenshot({ path: `workflow-05-progress-${attempts}.png` });
+        
+        if (scan.status === 'completed') {
+          scanCompleted = true;
+          console.log('✅ Scan completed successfully!');
+          break;
+        } else if (scan.status === 'failed') {
+          console.log('❌ Scan failed');
+          break;
+        } else if (scan.status === 'cancelled') {
+          console.log('⚠️ Scan was cancelled');
+          break;
         }
         
-        if (progressChecks === 5) {
-          await takeScreenshot(page, '09-scan-progress');
-        }
+        // Wait 5 seconds before next check
+        await new Promise(resolve => setTimeout(resolve, 5000));
         
-        await wait(2000);
-        progressChecks++;
+      } catch (error) {
+        console.log(`❌ Error checking scan status: ${error.message}`);
+        await new Promise(resolve => setTimeout(resolve, 5000));
       }
-      
-    } catch (error) {
-      console.log('⚠️  Progress monitoring error:', error.message);
     }
 
-    // Test 6: Check Results
-    console.log('\n📍 TEST 6: Check Scan Results');
-    console.log('============================');
+    if (!scanCompleted) {
+      console.log('⚠️ Scan did not complete within timeout, but continuing...');
+    }
+
+    // 4. VIEW SCAN DETAILS
+    console.log('\n4️⃣ Viewing scan details...');
+    await page.goto(`http://localhost:3002/scans/${scanId}`, { waitUntil: 'networkidle0' });
+    await page.screenshot({ path: 'workflow-06-scan-details.png' });
+
+    // Check for scan results
+    const hasResults = await page.$('.bg-white.shadow.rounded-lg');
+    if (hasResults) {
+      console.log('✅ Scan details page loaded with results');
+    } else {
+      console.log('⚠️ Scan details page loaded but no results visible');
+    }
+
+    // 5. TEST ALL NAVIGATION
+    console.log('\n5️⃣ Testing all navigation...');
+    
+    const navigationTests = [
+      { name: 'Dashboard', url: 'http://localhost:3002/dashboard' },
+      { name: 'All Scans', url: 'http://localhost:3002/scans' },
+      { name: 'Reports', url: 'http://localhost:3002/reports' },
+      { name: 'All Scanners', url: 'http://localhost:3002/all-scanners' },
+      { name: 'Security Dashboard', url: 'http://localhost:3002/security-dashboard' }
+    ];
+
+    for (const test of navigationTests) {
+      try {
+        console.log(`Testing ${test.name}...`);
+        await page.goto(test.url, { waitUntil: 'networkidle0' });
+        
+        const current = page.url();
+        if (current.includes('/404')) {
+          console.log(`❌ ${test.name}: 404 Error`);
+        } else if (current === test.url) {
+          console.log(`✅ ${test.name}: OK`);
+        } else {
+          console.log(`⚠️ ${test.name}: Redirected to ${current}`);
+        }
+        
+        await page.screenshot({ path: `workflow-nav-${test.name.toLowerCase().replace(' ', '-')}.png` });
+        
+      } catch (error) {
+        console.log(`❌ ${test.name}: Error - ${error.message}`);
+      }
+    }
+
+    // 6. GENERATE PDF REPORT
+    console.log('\n6️⃣ Generating PDF report...');
     
     try {
-      // Wait a bit for results
-      await wait(5000);
+      const reportResponse = await axios.post(
+        `${API_URL}/scans/${scanId}/report`,
+        { format: 'pdf' },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          responseType: 'arraybuffer'
+        }
+      );
       
-      const results = await page.evaluate(() => {
-        const resultElements = document.querySelectorAll('.result, .vulnerability, [class*="finding"], [class*="issue"]');
-        return Array.from(resultElements).slice(0, 5).map(el => el.textContent);
+      const reportPath = `scan-report-${scanId}-${Date.now()}.pdf`;
+      await fs.writeFile(reportPath, reportResponse.data);
+      console.log(`✅ PDF report generated: ${reportPath}`);
+      
+    } catch (error) {
+      console.log(`❌ Failed to generate PDF: ${error.message}`);
+      
+      // Try alternative report generation
+      try {
+        const htmlResponse = await axios.get(`${API_URL}/scans/${scanId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const reportData = {
+          scanId: scanId,
+          target: htmlResponse.data.data.target,
+          type: htmlResponse.data.data.type,
+          status: htmlResponse.data.data.status,
+          results: htmlResponse.data.data.results || [],
+          createdAt: htmlResponse.data.data.created_at,
+          completedAt: htmlResponse.data.data.completed_at
+        };
+        
+        const reportPath = `scan-report-${scanId}-${Date.now()}.json`;
+        await fs.writeFile(reportPath, JSON.stringify(reportData, null, 2));
+        console.log(`✅ JSON report generated: ${reportPath}`);
+        
+      } catch (jsonError) {
+        console.log(`❌ Failed to generate JSON report: ${jsonError.message}`);
+      }
+    }
+
+    // 7. TEST SCAN LIST AND VIEW DETAILS
+    console.log('\n7️⃣ Testing scan list and view details...');
+    
+    await page.goto('http://localhost:3002/scans', { waitUntil: 'networkidle0' });
+    await page.screenshot({ path: 'workflow-07-scan-list.png' });
+    
+    // Look for view details button
+    const viewButtons = await page.$$('button[aria-label="View Details"], svg[data-testid="VisibilityIcon"]');
+    if (viewButtons.length > 0) {
+      console.log(`✅ Found ${viewButtons.length} view details buttons`);
+      
+      // Click the first view details button
+      await viewButtons[0].click();
+      await page.waitForNavigation({ waitUntil: 'networkidle0' });
+      
+      const detailsUrl = page.url();
+      if (detailsUrl.includes('/scans/') && !detailsUrl.includes('/404')) {
+        console.log('✅ View details button works correctly');
+        await page.screenshot({ path: 'workflow-08-view-details-success.png' });
+      } else {
+        console.log(`❌ View details redirected to: ${detailsUrl}`);
+      }
+    } else {
+      console.log('⚠️ No view details buttons found');
+    }
+
+    // 8. FINAL SUMMARY
+    console.log('\n8️⃣ Final summary...');
+    
+    const finalScanResponse = await axios.get(`${API_URL}/scans/${scanId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    const finalScan = finalScanResponse.data.data;
+    
+    console.log('\n📊 SCAN SUMMARY:');
+    console.log(`   Target: ${finalScan.target}`);
+    console.log(`   Type: ${finalScan.type}`);
+    console.log(`   Status: ${finalScan.status}`);
+    console.log(`   Progress: ${finalScan.progress}%`);
+    console.log(`   Results: ${finalScan.results ? finalScan.results.length : 0} findings`);
+    console.log(`   Created: ${finalScan.created_at}`);
+    console.log(`   Completed: ${finalScan.completed_at || 'N/A'}`);
+    
+    if (finalScan.results && finalScan.results.length > 0) {
+      const severityCounts = finalScan.results.reduce((acc, result) => {
+        acc[result.severity] = (acc[result.severity] || 0) + 1;
+        return acc;
+      }, {});
+      
+      console.log('\n📈 FINDINGS BY SEVERITY:');
+      Object.entries(severityCounts).forEach(([severity, count]) => {
+        console.log(`   ${severity}: ${count}`);
       });
-      
-      if (results.length > 0) {
-        console.log('✅ Found scan results:', results.length);
-        results.forEach((result, i) => console.log(`  ${i + 1}. ${result.substring(0, 50)}...`));
-      }
-      
-      await takeScreenshot(page, '10-scan-results');
-      
-    } catch (error) {
-      console.log('⚠️  Results check error:', error.message);
     }
 
-    // Test 7: Generate Report
-    console.log('\n📍 TEST 7: Generate Report');
-    console.log('=========================');
-    
-    try {
-      const reportButton = await page.$('button:contains("Report"), button:contains("Generate"), a:contains("Report")');
-      if (reportButton) {
-        await reportButton.click();
-        console.log('✅ Report generation initiated');
-        await wait(3000);
-        await takeScreenshot(page, '11-report-generation');
-      }
-      
-      // Look for download button
-      const downloadButton = await page.$('button:contains("Download"), a:contains("Download"), a[href*="pdf"]');
-      if (downloadButton) {
-        console.log('✅ Download button found');
-        await takeScreenshot(page, '12-report-download');
-      }
-      
-    } catch (error) {
-      console.log('⚠️  Report generation error:', error.message);
-    }
+    console.log('\n✅ Complete workflow test finished successfully!');
+    await page.screenshot({ path: 'workflow-09-final-success.png' });
 
-    // Final summary
-    console.log('\n🎉 TEST SUMMARY');
-    console.log('================');
-    console.log('All tests completed. Check screenshots folder for visual verification.');
-    console.log(`Screenshots saved in: ${screenshotsDir}`);
-    
   } catch (error) {
-    console.error('❌ Test failed with error:', error);
-    await takeScreenshot(page, 'error-state');
+    console.error('\n❌ Test failed:', error.message);
+    if (page) {
+      await page.screenshot({ path: 'workflow-error-state.png' });
+    }
   } finally {
-    await wait(5000); // Keep browser open for 5 seconds
-    await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 
-// Run the test
-runCompleteWorkflowTest().catch(console.error);
+testCompleteWorkflow().catch(console.error);

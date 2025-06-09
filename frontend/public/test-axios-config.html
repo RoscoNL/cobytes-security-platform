@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Axios Config</title>
+</head>
+<body>
+    <h1>Check Console for Axios Configuration</h1>
+    <div id="output"></div>
+    
+    <script>
+        // Wait for page to load
+        window.addEventListener('load', async () => {
+            console.log('Checking axios configuration...');
+            
+            // Check if axios is available
+            if (window.axios) {
+                console.log('Axios found in window:', window.axios);
+                console.log('Axios defaults:', window.axios.defaults);
+            } else {
+                console.log('Axios not found in window');
+            }
+            
+            // Check environment variables
+            console.log('REACT_APP_API_URL:', process?.env?.REACT_APP_API_URL || 'not available');
+            
+            // Try to import scan service
+            try {
+                // This won't work in plain HTML, but let's see what happens
+                console.log('Attempting to check scan service...');
+            } catch (e) {
+                console.log('Cannot import modules in plain HTML');
+            }
+            
+            document.getElementById('output').textContent = 'Check browser console for details';
+        });
+    </script>
+</body>
+</html>

@@ -179,11 +179,16 @@ const FreeScan: React.FC = () => {
                 fullWidth
                 label="Website URL"
                 placeholder="https://example.com"
+                name="url"
+                type="url"
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 error={!!error}
-                helperText={error}
+                helperText={error || "Enter the URL you want to scan"}
                 sx={{ mb: 3 }}
+                inputProps={{
+                  'data-testid': 'free-scan-url-input'
+                }}
               />
               
               <Button

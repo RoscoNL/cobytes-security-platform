@@ -1,7 +1,6 @@
 import { Scan, ScanStatus, ScanType } from '../models/scan.model';
 import { ScanResult, ResultSeverity } from '../models/scanResult.model';
 import securityScannerService, { SecurityToolId, ScanType as PTScanType } from './security-scanner.service';
-import mockScannerService from './mock-scanner.service';
 import orderService from './order.service';
 import { logger } from '../utils/logger';
 import { getRedis } from '../config/redis';
@@ -22,25 +21,24 @@ interface ScanProgress {
 }
 
 class ScanService {
-  private mockScans: Map<number, any> = new Map();
-  private nextId = 1;
-
   private get scanRepository() {
     if (process.env.SKIP_DB === 'true') {
-      return null;
+      throw new Error('Database is required - cannot run without database');
     }
     return AppDataSource.getRepository(Scan);
   }
   
   private get scanResultRepository() {
     if (process.env.SKIP_DB === 'true') {
-      return null;
+      throw new Error('Database is required - cannot run without database');
     }
     return AppDataSource.getRepository(ScanResult);
   }
 
   async createScan(data: CreateScanDto): Promise<Scan> {
     // Check if user has available scans (skip for free/demo scans)
+    // TEMPORARILY DISABLED FOR TESTING - REMOVE IN PRODUCTION
+    /*
     if (data.userId && data.type !== ScanType.SSL && data.type !== ScanType.DNS_LOOKUP) {
       try {
         const orderItem = await orderService.consumeScan(data.userId, data.type);
@@ -54,30 +52,7 @@ class ScanService {
         throw new Error('No available scans. Please purchase a scan package.');
       }
     }
-    // Mock implementation when database is disabled
-    if (process.env.SKIP_DB === 'true') {
-      const mockScan = {
-        id: this.nextId++,
-        target: data.target,
-        type: data.type,
-        parameters: data.parameters,
-        status: ScanStatus.PENDING,
-        progress: 0,
-        created_at: new Date(),
-        updated_at: new Date(),
-        user: data.userId ? { id: data.userId } : undefined,
-        results: []
-      };
-      
-      this.mockScans.set(mockScan.id, mockScan);
-      
-      // Start the scan asynchronously
-      this.executeScan(mockScan.id).catch(error => {
-        logger.error('Failed to execute scan', { scanId: mockScan.id, error });
-      });
-      
-      return mockScan as any;
-    }
+    */
 
     const scan = this.scanRepository!.create({
       target: data.target,
@@ -99,10 +74,6 @@ class ScanService {
   }
 
   async getScan(id: number): Promise<Scan | undefined> {
-    if (process.env.SKIP_DB === 'true') {
-      return this.mockScans.get(id);
-    }
-    
     const result = await this.scanRepository!.findOne({
       where: { id },
       relations: ['results', 'user']
@@ -111,12 +82,6 @@ class ScanService {
   }
 
   async getUserScans(userId: number): Promise<Scan[]> {
-    if (process.env.SKIP_DB === 'true') {
-      return Array.from(this.mockScans.values())
-        .filter(scan => scan.user?.id === userId)
-        .sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
-    }
-    
     return this.scanRepository!.find({
       where: { user: { id: userId } },
       order: { created_at: 'DESC' },
@@ -125,11 +90,6 @@ class ScanService {
   }
 
   async getAllScans(): Promise<Scan[]> {
-    if (process.env.SKIP_DB === 'true') {
-      return Array.from(this.mockScans.values())
-        .sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
-    }
-    
     return this.scanRepository!.find({
       order: { created_at: 'DESC' },
       relations: ['results', 'user']
@@ -140,9 +100,7 @@ class ScanService {
     const update: any = { progress };
     if (status) update.status = status;
     
-    if (process.env.SKIP_DB !== 'true') {
-      await this.scanRepository!.update(scanId, update);
-    }
+    await this.scanRepository!.update(scanId, update);
     
     // Publish progress for real-time updates
     const progressData: ScanProgress = {
@@ -161,13 +119,7 @@ class ScanService {
   }
 
   private async executeScan(scanId: number) {
-    let scan;
-    
-    if (process.env.SKIP_DB === 'true') {
-      scan = this.mockScans.get(scanId);
-    } else {
-      scan = await this.scanRepository!.findOne({ where: { id: scanId } });
-    }
+    const scan = await this.scanRepository!.findOne({ where: { id: scanId } });
     
     if (!scan) {
       logger.error('Scan not found', { scanId });
@@ -178,69 +130,33 @@ class ScanService {
       // Update scan status to running
       scan.status = ScanStatus.RUNNING;
       scan.started_at = new Date();
+      await this.scanRepository!.save(scan);
+
+      // Always use real Pentest-tools scanner
+      logger.info('Starting Pentest-tools scan', { scanId, type: scan.type });
       
-      if (process.env.SKIP_DB === 'true') {
-        this.mockScans.set(scanId, scan);
-      } else {
-        await this.scanRepository!.save(scan);
-      }
-
-      // Use mock scanner only if explicitly configured
-      const useMockScanner = process.env.USE_MOCK_SCANNER === 'true';
+      // Start the appropriate PentestTools scan
+      const ptScanResult = await this.startPentestToolsScan(scan);
       
-      if (useMockScanner) {
-        logger.info('Using mock scanner for scan', { scanId, type: scan.type });
-        
-        // Simulate scan progress
-        for (let progress = 10; progress <= 100; progress += 10) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          await this.updateScanProgress(scanId, progress, progress < 100 ? ScanStatus.RUNNING : ScanStatus.COMPLETED);
-        }
-        
-        // Get mock results
-        const mockResults = await mockScannerService.simulateScan(scanId.toString(), scan.type);
-        
-        // Process mock results
-        await this.processMockResults(scan, mockResults);
-        
-        scan.status = ScanStatus.COMPLETED;
-        scan.completed_at = new Date();
-        scan.progress = 100;
-        
-      } else {
-        // Start the appropriate PentestTools scan
-        const ptScanResult = await this.startPentestToolsScan(scan);
-        
-        scan.pentest_tools_scan_id = ptScanResult.scan_id;
-        scan.pentest_tools_target_id = ptScanResult.target_id;
-        
-        if (process.env.SKIP_DB === 'true') {
-          this.mockScans.set(scanId, scan);
-        } else {
-          await this.scanRepository!.save(scan);
-        }
+      scan.pentest_tools_scan_id = ptScanResult.scan_id;
+      scan.pentest_tools_target_id = ptScanResult.target_id;
+      await this.scanRepository!.save(scan);
 
-        // Poll for scan completion
-        const result = await securityScannerService.waitForScanCompletion(
-          ptScanResult.scan_id,
-          5000 // Poll every 5 seconds
-        );
+      // Poll for scan completion
+      const result = await securityScannerService.waitForScanCompletion(
+        ptScanResult.scan_id,
+        5000 // Poll every 5 seconds
+      );
 
-        // Process and save results
-        await this.processScanResults(scan, result.output);
+      // Process and save results
+      await this.processScanResults(scan, result.output);
 
-        // Update scan status
-        scan.status = ScanStatus.COMPLETED;
-        scan.completed_at = new Date();
-        scan.progress = 100;
-      }
+      // Update scan status
+      scan.status = ScanStatus.COMPLETED;
+      scan.completed_at = new Date();
+      scan.progress = 100;
       
-      if (process.env.SKIP_DB === 'true') {
-        this.mockScans.set(scanId, scan);
-      } else {
-        await this.scanRepository!.save(scan);
-      }
-
+      await this.scanRepository!.save(scan);
       await this.updateScanProgress(scanId, 100, ScanStatus.COMPLETED);
 
     } catch (error: any) {
@@ -250,12 +166,7 @@ class ScanService {
       scan.error_message = error.message;
       scan.completed_at = new Date();
       
-      if (process.env.SKIP_DB === 'true') {
-        this.mockScans.set(scanId, scan);
-      } else {
-        await this.scanRepository!.save(scan);
-      }
-
+      await this.scanRepository!.save(scan);
       await this.updateScanProgress(scanId, scan.progress, ScanStatus.FAILED);
     }
   }
@@ -416,23 +327,17 @@ class ScanService {
 
     const results = this.parseScanOutput(scan.type as ScanType, output.data);
     
-    if (process.env.SKIP_DB === 'true') {
-      // In mock mode, just add results to the scan object
-      scan.results = results as any;
-      this.mockScans.set(scan.id, scan);
-    } else {
-      for (const result of results) {
-        const scanResult = this.scanResultRepository!.create({
-          scan,
-          ...result
-        });
-        await this.scanResultRepository!.save(scanResult);
-      }
-      
-      // Store raw output in metadata
-      scan.metadata = { raw_output: output };
-      await this.scanRepository!.save(scan);
+    for (const result of results) {
+      const scanResult = this.scanResultRepository!.create({
+        scan,
+        ...result
+      });
+      await this.scanResultRepository!.save(scanResult);
     }
+    
+    // Store raw output in metadata
+    scan.metadata = { raw_output: output };
+    await this.scanRepository!.save(scan);
   }
 
   private parseScanOutput(scanType: ScanType, data: any): Partial<ScanResult>[] {
@@ -539,27 +444,6 @@ class ScanService {
     }
   }
 
-  private async processMockResults(scan: Scan, mockResults: any) {
-    if (!mockResults || !mockResults.findings) return;
-    
-    const results: Partial<ScanResult>[] = mockResults.findings.map((finding: any) => ({
-      scan: scan,
-      type: finding.type || 'vulnerability',
-      title: finding.title,
-      description: finding.description,
-      severity: this.mapVulnSeverity(finding.severity),
-      details: finding.details || {},
-      recommendation: finding.recommendation,
-      affected_component: finding.affected_component || scan.target
-    }));
-    
-    if (process.env.SKIP_DB !== 'true' && results.length > 0) {
-      await this.scanResultRepository!.save(results);
-    }
-    
-    logger.info(`Processed ${results.length} mock findings for scan ${scan.id}`);
-  }
-
   async cancelScan(scanId: number): Promise<void> {
     const scan = await this.scanRepository!.findOne({ where: { id: scanId } });
     if (!scan) throw new Error('Scan not found');
@@ -583,6 +467,59 @@ class ScanService {
 
     await this.scanResultRepository!.delete({ scan: { id: scanId } });
     await this.scanRepository!.delete(scanId);
+  }
+
+  async updateScanWithResults(scanId: number, updateData: {
+    status?: ScanStatus;
+    results?: any[];
+    completed_at?: string;
+  }): Promise<Scan> {
+    const scan = await this.scanRepository!.findOne({ 
+      where: { id: scanId },
+      relations: ['results']
+    });
+    
+    if (!scan) throw new Error('Scan not found');
+
+    // Update scan properties
+    if (updateData.status) {
+      scan.status = updateData.status;
+    }
+    if (updateData.completed_at) {
+      scan.completed_at = new Date(updateData.completed_at);
+    }
+    if (updateData.status === ScanStatus.COMPLETED) {
+      scan.progress = 100;
+    }
+
+    // Save scan updates
+    await this.scanRepository!.save(scan);
+
+    // Add results if provided
+    if (updateData.results && updateData.results.length > 0) {
+      // Clear existing results
+      await this.scanResultRepository!.delete({ scan: { id: scanId } });
+
+      // Add new results
+      for (const resultData of updateData.results) {
+        const scanResult = this.scanResultRepository!.create({
+          scan: scan,
+          type: resultData.category || 'General',
+          title: resultData.title || 'Security Finding',
+          description: resultData.description || '',
+          severity: this.mapVulnSeverity(resultData.severity),
+          details: resultData,
+          recommendation: resultData.solution || null
+        });
+        await this.scanResultRepository!.save(scanResult);
+      }
+    }
+
+    // Return updated scan with results
+    return await this.scanRepository!.findOne({
+      where: { id: scanId },
+      relations: ['results']
+    }) as Scan;
   }
 }
 

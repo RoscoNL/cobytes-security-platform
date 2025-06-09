@@ -57,13 +57,13 @@ class SecurityScannerProxyService {
 
   constructor() {
     // API key can be provided by frontend or use the one from backend
-    this.apiKey = '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
+    this.apiKey = 'E0Eq4lmxoJeMSd6DIGLiqCW4yGRnJKywjhnXl78r471e4e69';
   }
 
   private buildProxyUrl(path: string): string {
-    const targetUrl = `${SCANNER_API_BASE}${path}`;
-    // Use thingproxy.freeboard.io which works without API key
-    return `https://thingproxy.freeboard.io/fetch/${targetUrl}`;
+    // Use the backend CORS proxy
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+    return `${API_BASE_URL}/proxy/pentest-tools${path}`;
   }
 
   private async request(method: string, path: string, data?: any) {
@@ -74,7 +74,6 @@ class SecurityScannerProxyService {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
       },
       body: data ? JSON.stringify(data) : undefined,
     });

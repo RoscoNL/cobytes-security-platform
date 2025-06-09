@@ -23,7 +23,7 @@ const OrderCancelled: React.FC = () => {
   useEffect(() => {
     // Try to fetch order number if possible
     if (orderId) {
-      api.get(`/api/orders/${orderId}`)
+      api.get(`/orders/${orderId}`)
         .then(response => {
           setOrderNumber(response.data.data.order_number);
         })

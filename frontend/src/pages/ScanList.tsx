@@ -252,7 +252,7 @@ const ScanList: React.FC = () => {
           transform: 'translateY(-2px)',
         },
       }}
-      onClick={() => navigate(`/dashboard/scans/${scan.id}`)}
+      onClick={() => navigate(`/scans/${scan.id}`)}
     >
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
@@ -308,7 +308,7 @@ const ScanList: React.FC = () => {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/dashboard/scans/${scan.id}`);
+                navigate(`/scans/${scan.id}`);
               }}
             >
               <ViewIcon />
@@ -396,7 +396,7 @@ const ScanList: React.FC = () => {
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => navigate('/dashboard/scans/new')}
+              onClick={() => navigate('/scans/new')}
               sx={{
                 background: `linear-gradient(135deg, ${cobytesColors.orange} 0%, ${cobytesColors.coral} 100%)`,
                 '&:hover': {
@@ -495,7 +495,7 @@ const ScanList: React.FC = () => {
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
-                  onClick={() => navigate('/dashboard/scans/new')}
+                  onClick={() => navigate('/scans/new')}
                   sx={{
                     bgcolor: cobytesColors.orange,
                     '&:hover': { bgcolor: cobytesColors.coral },
@@ -533,7 +533,7 @@ const ScanList: React.FC = () => {
                       key={scan.id}
                       hover
                       sx={{ cursor: 'pointer' }}
-                      onClick={() => navigate(`/dashboard/scans/${scan.id}`)}
+                      onClick={() => navigate(`/scans/${scan.id}`)}
                     >
                       <TableCell>{getTypeIcon(scan.type)}</TableCell>
                       <TableCell>
@@ -597,7 +597,7 @@ const ScanList: React.FC = () => {
                               size="small"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                navigate(`/dashboard/scans/${scan.id}`);
+                                navigate(`/scans/${scan.id}`);
                               }}
                             >
                               <ViewIcon />
@@ -653,7 +653,7 @@ const ScanList: React.FC = () => {
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={() => navigate('/all-scanners-new')}
+                onClick={() => navigate('/all-scanners')}
                 sx={{
                   bgcolor: cobytesColors.orange,
                   '&:hover': { bgcolor: cobytesColors.coral },

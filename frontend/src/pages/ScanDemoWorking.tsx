@@ -20,7 +20,6 @@ import {
   ErrorOutlined,
   ScannerOutlined,
 } from '@mui/icons-material';
-import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
@@ -59,19 +58,33 @@ const ScanDemoWorking: React.FC = () => {
 
     try {
       // Create scan without authentication
-      const response = await axios.post(`${API_URL}/scans/free`, {
-        target,
-        type: 'ssl',
+      console.log('Creating free scan at:', `${API_URL}/scans/free`);
+      const response = await fetch(`${API_URL}/scans/free`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          target,
+          type: 'ssl',
+        }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
 
-      const scan = response.data.data;
+      const scan = data.data || data;
       setScanId(scan.id);
       
       // Poll for scan completion
       const pollInterval = setInterval(async () => {
         try {
-          const statusResponse = await axios.get(`${API_URL}/scans/free/${scan.id}`);
-          const currentScan = statusResponse.data.data;
+          const statusResponse = await fetch(`${API_URL}/scans/free/${scan.id}`);
+          const statusData = await statusResponse.json();
+          const currentScan = statusData.data || statusData;
           
           setScanProgress(currentScan.progress || 0);
           
@@ -86,24 +99,20 @@ const ScanDemoWorking: React.FC = () => {
           }
         } catch (error) {
           console.error('Error polling scan status:', error);
-          clearInterval(pollInterval);
-          setError('Failed to get scan status');
-          setScanning(false);
+          // Don't clear interval on network errors, just continue polling
         }
       }, 2000); // Poll every 2 seconds
 
       // Timeout after 60 seconds
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         clearInterval(pollInterval);
-        if (scanning) {
-          setError('Scan timed out');
-          setScanning(false);
-        }
+        setError('Scan timed out');
+        setScanning(false);
       }, 60000);
 
     } catch (error: any) {
       console.error('Failed to start scan:', error);
-      setError(error.response?.data?.error || 'Failed to start scan. Please try again.');
+      setError(error.message || 'Failed to start scan. Please try again.');
       setScanning(false);
     }
   };

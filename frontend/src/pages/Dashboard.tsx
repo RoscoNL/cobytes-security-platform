@@ -151,7 +151,7 @@ const Dashboard: React.FC = () => {
             <Button
               variant="contained"
               size="large"
-              onClick={() => navigate('/dashboard/scans/new')}
+              onClick={() => navigate('/scans/new')}
               sx={{
                 bgcolor: 'white',
                 color: cobytesColors.orange,
@@ -280,7 +280,7 @@ const Dashboard: React.FC = () => {
                   <Button
                     variant="contained"
                     startIcon={<SecurityIcon />}
-                    onClick={() => navigate('/dashboard/scans/new')}
+                    onClick={() => navigate('/scans/new')}
                     sx={{
                       bgcolor: cobytesColors.orange,
                       '&:hover': { bgcolor: cobytesColors.coral },
@@ -378,7 +378,7 @@ const Dashboard: React.FC = () => {
                   '&:hover': { boxShadow: 4 },
                   transition: 'box-shadow 0.3s',
                 }}
-                onClick={() => navigate('/dashboard/scans/new')}
+                onClick={() => navigate('/scans/new')}
               >
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>

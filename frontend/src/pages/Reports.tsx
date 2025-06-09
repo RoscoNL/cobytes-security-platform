@@ -81,7 +81,7 @@ const Reports: React.FC = () => {
         scanId: scan.id,
         scanType: scan.type || 'Security Scan',
         target: scan.target,
-        createdAt: scan.createdAt,
+        createdAt: scan.created_at,
         status: scan.status,
         severity: getSeverityFromScan(scan),
         findings: {
@@ -306,7 +306,6 @@ const Reports: React.FC = () => {
                       <Chip
                         label={report.status}
                         size="small"
-                        color={report.severity as any}
                         sx={{
                           bgcolor: report.severity === 'success' ? '#D1FAE5' :
                                   report.severity === 'warning' ? '#FEF3C7' :
@@ -357,7 +356,7 @@ const Reports: React.FC = () => {
                       <Button
                         size="small"
                         variant="outlined"
-                        onClick={() => window.location.href = `/dashboard/scans/${report.scanId}`}
+                        onClick={() => window.location.href = `/scans/${report.scanId}`}
                       >
                         View
                       </Button>

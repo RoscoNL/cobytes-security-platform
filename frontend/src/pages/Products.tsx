@@ -154,6 +154,7 @@ const Products: React.FC = () => {
         {filteredProducts.map((product) => (
           <Grid item xs={12} md={6} lg={4} key={product.id}>
             <Card 
+              data-testid="product-card"
               sx={{ 
                 height: '100%', 
                 display: 'flex', 

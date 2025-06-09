@@ -79,7 +79,7 @@ const Checkout: React.FC = () => {
 
   const fetchCart = async () => {
     try {
-      const response = await api.get('/api/cart');
+      const response = await api.get('/cart');
       if (response.error) {
         console.error('Error fetching cart:', response.error);
         navigate('/cart');
@@ -101,7 +101,7 @@ const Checkout: React.FC = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await api.get('/api/auth/me');
+      const response = await api.get('/auth/me');
       if (response.error) {
         console.error('Error fetching user data:', response.error);
         return;
@@ -182,7 +182,7 @@ const Checkout: React.FC = () => {
     
     try {
       // Create order
-      const orderResponse = await api.post('/api/orders', {
+      const orderResponse = await api.post('/orders', {
         ...billingData,
         cart_id: cart?.id,
       });

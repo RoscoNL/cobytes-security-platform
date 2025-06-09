@@ -189,6 +189,24 @@ class ScanService {
     }
   }
 
+  // Login with demo credentials for ScanDemo page
+  async loginForDemo(): Promise<void> {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+        email: 'test@cobytes.com',
+        password: 'test123'
+      });
+      
+      if (response.data.data?.token) {
+        this.setToken(response.data.data.token);
+        console.log('Demo login successful');
+      }
+    } catch (error) {
+      console.warn('Demo login failed:', error);
+      throw error;
+    }
+  }
+
   // Security Scanner integration
   async createSecurityScan(toolId: number, target: string, params: any = {}): Promise<any> {
     try {

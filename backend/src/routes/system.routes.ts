@@ -2,18 +2,54 @@ import { Router, Request, Response } from 'express';
 import { asyncHandler } from '@middleware/asyncHandler';
 import securityScannerService from '@services/security-scanner.service';
 import { logger } from '@utils/logger';
+import { getConnection } from 'typeorm';
 
 const router = Router();
 
 // Health check endpoint
 router.get('/health', (req: Request, res: Response) => {
   res.json({
-    status: 'healthy',
+    status: 'ok',
     timestamp: new Date().toISOString(),
     service: 'cobytes-security-platform',
     version: '2.0.0'
   });
 });
+
+// Database health check
+router.get('/database-health', asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const connection = getConnection();
+    await connection.query('SELECT 1');
+    res.json({
+      database: 'connected',
+      name: connection.options.database,
+      type: connection.options.type
+    });
+  } catch (error: any) {
+    res.status(503).json({
+      database: 'disconnected',
+      error: error.message
+    });
+  }
+}));
+
+// Redis health check
+router.get('/redis-health', asyncHandler(async (req: Request, res: Response) => {
+  try {
+    // Since we're using in-memory cache, just check if it's initialized
+    const cacheStatus = (global as any).inMemoryCache ? 'connected' : 'disconnected';
+    res.json({
+      redis: cacheStatus,
+      type: 'in-memory'
+    });
+  } catch (error: any) {
+    res.status(503).json({
+      redis: 'disconnected',
+      error: error.message
+    });
+  }
+}));
 
 // Check API status
 router.get('/api-status', asyncHandler(async (req: Request, res: Response) => {

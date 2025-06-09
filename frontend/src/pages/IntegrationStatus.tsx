@@ -170,8 +170,8 @@ const IntegrationStatus: React.FC = () => {
           Security Scanner Integration Status
         </Typography>
         
-        <Alert severity="success" sx={{ mb: 3 }}>
-          All scanners are integrated with the Security Scanner API using a working CORS proxy. No mock data!
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <strong>IMPORTANT:</strong> All mock data has been removed from the system. Only real API integrations are used. If something doesn't work, it will show an error instead of mock data.
         </Alert>
 
         <Grid container spacing={3}>

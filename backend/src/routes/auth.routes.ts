@@ -3,21 +3,10 @@ import { logger } from '@utils/logger';
 import { asyncHandler } from '@middleware/asyncHandler';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { AppDataSource } from '@config/typeorm';
+import { User } from '@models/user.model';
 
 const router = Router();
-
-// Mock user database
-const users = new Map<string, any>();
-
-// Initialize with a test user
-users.set('admin@cobytes.com', {
-  id: 'user_1',
-  email: 'admin@cobytes.com',
-  password: bcrypt.hashSync('admin123', 10),
-  role: 'admin',
-  name: 'Admin User',
-  createdAt: new Date()
-});
 
 // Login endpoint
 router.post('/login', asyncHandler(async (req: Request, res: Response) => {
@@ -31,37 +20,62 @@ router.post('/login', asyncHandler(async (req: Request, res: Response) => {
     });
   }
   
-  const user = users.get(email);
-  
-  if (!user || !bcrypt.compareSync(password, user.password)) {
-    return res.status(401).json({
+  try {
+    // Use real database
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({
+      where: { email: email.toLowerCase() }
+    });
+    
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
+    }
+    
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
+    }
+    
+    // Check if user is active
+    if (!user.is_active) {
+      return res.status(403).json({
+        success: false,
+        error: 'Account is disabled'
+      });
+    }
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'cobytes-security-secret-2024',
+      { expiresIn: '7d' }
+    );
+    
+    // Return user data (without password)
+    const { password: _, ...userData } = user;
+    
+    res.json({
+      success: true,
+      data: {
+        token,
+        user: userData
+      }
+    });
+  } catch (error: any) {
+    logger.error('Login error:', error);
+    return res.status(500).json({
       success: false,
-      error: 'Invalid credentials'
+      error: 'Authentication failed',
+      message: error.message
     });
   }
-  
-  // Generate JWT token
-  const token = jwt.sign(
-    { 
-      userId: user.id, 
-      email: user.email, 
-      role: user.role 
-    },
-    process.env.JWT_SECRET || 'cobytes-secret-key',
-    { expiresIn: '24h' }
-  );
-  
-  // Remove password from response
-  const { password: _, ...userWithoutPassword } = user;
-  
-  res.json({
-    success: true,
-    data: {
-      user: userWithoutPassword,
-      token,
-      expiresIn: 86400 // 24 hours in seconds
-    }
-  });
 }));
 
 // Register endpoint
@@ -69,57 +83,10 @@ router.post('/register', asyncHandler(async (req: Request, res: Response) => {
   const { email, password, name, organization } = req.body;
   logger.info('POST /api/auth/register - New user registration', { email });
   
-  if (!email || !password || !name) {
-    return res.status(400).json({
-      success: false,
-      error: 'Email, password, and name are required'
-    });
-  }
-  
-  if (users.has(email)) {
-    return res.status(409).json({
-      success: false,
-      error: 'User already exists'
-    });
-  }
-  
-  // Create new user
-  const hashedPassword = bcrypt.hashSync(password, 10);
-  const userId = `user_${Date.now()}`;
-  
-  const newUser = {
-    id: userId,
-    email,
-    password: hashedPassword,
-    name,
-    organization,
-    role: 'user',
-    createdAt: new Date()
-  };
-  
-  users.set(email, newUser);
-  
-  // Generate JWT token
-  const token = jwt.sign(
-    { 
-      userId: newUser.id, 
-      email: newUser.email, 
-      role: newUser.role 
-    },
-    process.env.JWT_SECRET || 'cobytes-secret-key',
-    { expiresIn: '24h' }
-  );
-  
-  // Remove password from response
-  const { password: _, ...userWithoutPassword } = newUser;
-  
-  res.status(201).json({
-    success: true,
-    data: {
-      user: userWithoutPassword,
-      token,
-      expiresIn: 86400
-    }
+  // No real user database integrated yet
+  return res.status(503).json({
+    success: false,
+    error: 'Registration service not available - real user database integration required'
   });
 }));
 
@@ -191,8 +158,13 @@ router.get('/verify', asyncHandler(async (req: Request, res: Response) => {
   const token = authHeader.substring(7);
   
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'cobytes-secret-key') as any;
-    const user = Array.from(users.values()).find(u => u.id === decoded.userId);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'cobytes-security-secret-2024') as any;
+    
+    // Get user from database
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({
+      where: { id: decoded.id }
+    });
     
     if (!user) {
       return res.status(401).json({

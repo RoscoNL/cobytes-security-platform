@@ -1,0 +1,194 @@
+{
+  "timestamp": "2025-06-09T08:25:25.313Z",
+  "summary": {
+    "total": 17,
+    "passed": 15,
+    "failed": 2,
+    "errors": [
+      {
+        "type": "functionality",
+        "name": "Free SSL Scan",
+        "errors": [
+          "Scan did not start - no progress bar found"
+        ]
+      },
+      {
+        "type": "functionality",
+        "name": "Protected Pages Access",
+        "errors": [
+          "Dashboard: Loaded without authentication!",
+          "Scans List: Loaded without authentication!",
+          "Reports: Loaded without authentication!",
+          "Orders: Loaded without authentication!"
+        ]
+      }
+    ]
+  },
+  "pages": {
+    "Landing Page": {
+      "url": "http://localhost:3002",
+      "status": "passed",
+      "loadTime": 977,
+      "errors": [],
+      "consoleErrors": [],
+      "networkErrors": [],
+      "httpStatus": 200
+    },
+    "Products Page": {
+      "url": "http://localhost:3002/products",
+      "status": "passed",
+      "loadTime": 997,
+      "errors": [],
+      "consoleErrors": [],
+      "networkErrors": [],
+      "httpStatus": 200
+    },
+    "Pricing Page": {
+      "url": "http://localhost:3002/pricing",
+      "status": "passed",
+      "loadTime": 996,
+      "errors": [],
+      "consoleErrors": [],
+      "networkErrors": [],
+      "httpStatus": 200
+    },
+    "Login Page": {
+      "url": "http://localhost:3002/login",
+      "status": "passed",
+      "loadTime": 996,
+      "errors": [],
+      "consoleErrors": [],
+      "networkErrors": [],
+      "httpStatus": 200
+    },
+    "Shopping Cart": {
+      "url": "http://localhost:3002/cart",
+      "status": "passed",
+      "loadTime": 996,
+      "errors": [],
+      "consoleErrors": [],
+      "networkErrors": [],
+      "httpStatus": 200
+    },
+    "Free Scan": {
+      "url": "http://localhost:3002/free-scan",
+      "status": "passed",
+      "loadTime": 997,
+      "errors": [],
+      "consoleErrors": [],
+      "networkErrors": [],
+      "httpStatus": 200
+    },
+    "Scan Demo": {
+      "url": "http://localhost:3002/scan-demo",
+      "status": "passed",
+      "loadTime": 996,
+      "errors": [],
+      "consoleErrors": [],
+      "networkErrors": [],
+      "httpStatus": 200
+    },
+    "How To": {
+      "url": "http://localhost:3002/how-to",
+      "status": "passed",
+      "loadTime": 1003,
+      "errors": [],
+      "consoleErrors": [],
+      "networkErrors": [],
+      "httpStatus": 200
+    },
+    "All Scanners": {
+      "url": "http://localhost:3002/all-scanners-new",
+      "status": "passed",
+      "loadTime": 1001,
+      "errors": [],
+      "consoleErrors": [],
+      "networkErrors": [],
+      "httpStatus": 200
+    }
+  },
+  "api": {
+    "Health Check": {
+      "endpoint": "/health",
+      "method": "GET",
+      "status": "passed",
+      "responseTime": 16,
+      "httpStatus": 200,
+      "errors": []
+    },
+    "Get Products": {
+      "endpoint": "/api/products",
+      "method": "GET",
+      "status": "passed",
+      "responseTime": 11,
+      "httpStatus": 200,
+      "errors": []
+    },
+    "Get Scan Types": {
+      "endpoint": "/api/scans/scan-types",
+      "method": "GET",
+      "status": "passed",
+      "responseTime": 4,
+      "httpStatus": 200,
+      "errors": []
+    },
+    "Register User": {
+      "endpoint": "/api/auth/register",
+      "method": "POST",
+      "status": "passed",
+      "responseTime": 97,
+      "httpStatus": 201,
+      "errors": []
+    }
+  },
+  "functionality": {
+    "Login Flow": {
+      "name": "Login Flow",
+      "status": "passed",
+      "duration": 1216,
+      "errors": [],
+      "steps": [
+        "Navigated to login page",
+        "Filled login form",
+        "Login successful"
+      ]
+    },
+    "Free SSL Scan": {
+      "name": "Free SSL Scan",
+      "status": "failed",
+      "duration": 3852,
+      "errors": [
+        "Scan did not start - no progress bar found"
+      ],
+      "steps": [
+        "Navigated to scan demo",
+        "Entered target URL",
+        "Started scan"
+      ]
+    },
+    "Add to Cart": {
+      "name": "Add to Cart",
+      "status": "passed",
+      "duration": 1810,
+      "errors": [],
+      "steps": [
+        "Navigated to products page",
+        "Clicked add to cart",
+        "Item added to cart successfully"
+      ]
+    },
+    "Protected Pages Access": {
+      "name": "Protected Pages Access",
+      "status": "failed",
+      "duration": 12382,
+      "errors": [
+        "Dashboard: Loaded without authentication!",
+        "Scans List: Loaded without authentication!",
+        "Reports: Loaded without authentication!",
+        "Orders: Loaded without authentication!"
+      ],
+      "steps": []
+    }
+  },
+  "performance": {}
+}

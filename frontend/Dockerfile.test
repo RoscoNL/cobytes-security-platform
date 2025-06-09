@@ -1,0 +1,28 @@
+FROM node:18-alpine
+
+# Install Chromium for testing
+RUN apk add --no-cache chromium
+
+# Set Chrome path for Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy application files
+COPY . .
+
+# Create test reports directory
+RUN mkdir -p test-reports
+
+# Expose port
+EXPOSE 3002
+
+# Start application for testing
+CMD ["npm", "start"]

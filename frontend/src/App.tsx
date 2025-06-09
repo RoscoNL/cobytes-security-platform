@@ -1,88 +1,151 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { CircularProgress, Box } from '@mui/material';
 import cobytesTheme from './theme/cobytes-theme';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
+
+// Public pages
 import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
-import ScanNew from './pages/ScanNew';
-import ScanList from './pages/ScanList';
-import ScanDetail from './pages/ScanDetail';
-import Pricing from './pages/Pricing';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import Products from './pages/Products';
+import Pricing from './pages/Pricing';
+import FreeScan from './pages/FreeScan';
+import Contact from './pages/Contact';
 import AllScanners from './pages/AllScanners';
-import HowTo from './pages/HowTo';
-import ApiStatus from './pages/ApiStatus';
-import DirectScan from './pages/DirectScan';
-import CorsTest from './pages/CorsTest';
-import ProxyScan from './pages/ProxyScan';
-import CorsProxyTest from './pages/CorsProxyTest';
-import AllScannersNew from './pages/AllScannersNew';
-import IntegrationStatus from './pages/IntegrationStatus';
-import ScanStatus from './pages/ScanStatus';
 import ScanDemo from './pages/ScanDemo';
+import HowTo from './pages/HowTo';
+
+// Protected pages
+import Dashboard from './pages/Dashboard';
+import ScanList from './pages/ScanList';
+import ScanCreate from './pages/ScanCreate';
+import ScanDetail from './pages/ScanDetail';
 import SecurityDashboard from './pages/SecurityDashboard';
 import Reports from './pages/Reports';
-import FreeScan from './pages/FreeScan';
-import ScanDemoWorking from './pages/ScanDemoWorking';
-import Products from './pages/Products';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+
+// E-commerce pages
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
-import OrderPayment from './pages/OrderPayment';
-import OrderSuccess from './pages/OrderSuccess';
-import OrderCancelled from './pages/OrderCancelled';
 import Orders from './pages/Orders';
-import TestDirectCors from './pages/TestDirectCors';
-import DirectSecurityScanner from './pages/DirectSecurityScanner';
-import ScanCreate from './pages/ScanCreate';
-import ScanStatusSimple from './pages/ScanStatusSimple';
+import OrderSuccess from './pages/OrderSuccess';
+
+// Error pages
+import NotFound from './pages/NotFound';
+
 import './App.css';
+
+// Loading component
+const Loading = () => (
+  <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+    <CircularProgress />
+  </Box>
+);
 
 function App() {
   return (
     <ThemeProvider theme={cobytesTheme}>
       <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route element={<Layout />}>
-            <Route path="/" element={<Landing />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-            <Route path="/orders/:orderId/pay" element={<OrderPayment />} />
-            <Route path="/orders/:orderId/success" element={<OrderSuccess />} />
-            <Route path="/orders/:orderId/cancelled" element={<OrderCancelled />} />
-            <Route path="/free-scan" element={<FreeScan />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/how-to" element={<HowTo />} />
-            <Route path="/all-scanners-new" element={<AllScannersNew />} />
-            <Route path="/integration-status" element={<IntegrationStatus />} />
-            <Route path="/scan-status/:scanId" element={<ScanStatusSimple />} />
-            <Route path="/scan-demo" element={<ScanDemoWorking />} />
-            <Route path="/security-dashboard" element={<SecurityDashboard />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/dashboard/scans" element={<ProtectedRoute><ScanList /></ProtectedRoute>} />
-            <Route path="/dashboard/scans/new" element={<ProtectedRoute><ScanCreate /></ProtectedRoute>} />
-            <Route path="/dashboard/scans/:id" element={<ProtectedRoute><ScanDetail /></ProtectedRoute>} />
-            <Route path="/dashboard/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-            <Route path="/dashboard/scanners" element={<ProtectedRoute><AllScanners /></ProtectedRoute>} />
-            <Route path="/dashboard/how-to" element={<ProtectedRoute><HowTo /></ProtectedRoute>} />
-            <Route path="/dashboard/api-status" element={<ProtectedRoute><ApiStatus /></ProtectedRoute>} />
-            <Route path="/dashboard/direct-scan" element={<ProtectedRoute><DirectScan /></ProtectedRoute>} />
-            <Route path="/dashboard/cors-test" element={<ProtectedRoute><CorsTest /></ProtectedRoute>} />
-            <Route path="/dashboard/proxy-scan" element={<ProtectedRoute><ProxyScan /></ProtectedRoute>} />
-            <Route path="/dashboard/cors-proxy-test" element={<ProtectedRoute><CorsProxyTest /></ProtectedRoute>} />
-            <Route path="/dashboard/all-scanners" element={<ProtectedRoute><AllScannersNew /></ProtectedRoute>} />
-            <Route path="/dashboard/integration" element={<ProtectedRoute><IntegrationStatus /></ProtectedRoute>} />
-            <Route path="/dashboard/test-direct-cors" element={<ProtectedRoute><TestDirectCors /></ProtectedRoute>} />
-            <Route path="/dashboard/direct-pentest" element={<ProtectedRoute><DirectSecurityScanner /></ProtectedRoute>} />
-          </Route>
-        </Routes>
-      </Router>
+      <ErrorBoundary>
+        <Router>
+          <Routes>
+            {/* Auth routes - no layout */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            {/* Public routes with layout */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<Landing />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/free-scan" element={<FreeScan />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/all-scanners" element={<AllScanners />} />
+              <Route path="/scan-demo" element={<ScanDemo />} />
+              <Route path="/how-to" element={<HowTo />} />
+              
+              {/* Protected routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/scans" element={
+                <ProtectedRoute>
+                  <ScanList />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/scans/new" element={
+                <ProtectedRoute>
+                  <ScanCreate />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/scans/:id" element={
+                <ProtectedRoute>
+                  <ScanDetail />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/security-dashboard" element={
+                <ProtectedRoute>
+                  <SecurityDashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/reports" element={
+                <ProtectedRoute>
+                  <Reports />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              
+              {/* E-commerce routes */}
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/orders" element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/orders/:orderId/success" element={
+                <ProtectedRoute>
+                  <OrderSuccess />
+                </ProtectedRoute>
+              } />
+              
+              {/* 404 and redirects */}
+              <Route path="/404" element={<NotFound />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
+            </Route>
+          </Routes>
+        </Router>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }

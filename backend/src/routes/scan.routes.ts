@@ -20,5 +20,7 @@ router.get('/:id', optionalAuth, scanController.getScan);
 router.get('/', auth, scanController.getAllScans);
 router.post('/:id/cancel', optionalAuth, scanController.cancelScan);
 router.delete('/:id', optionalAuth, scanController.deleteScan);
+router.post('/:id/report', optionalAuth, scanController.generateReport);
+router.put('/:id/results', optionalAuth, scanController.updateScanResults);
 
 export const scanRoutes = router;

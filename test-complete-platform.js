@@ -8,8 +8,8 @@ const API_URL = 'http://localhost:3001/api';
 
 // Test credentials
 const TEST_USER = {
-  email: 'user@cobytes.com',
-  password: 'pass'
+  email: 'test@cobytes.com',
+  password: 'test123'
 };
 
 // Create directories

@@ -1,0 +1,36 @@
+FROM node:18-alpine
+
+# Install Chrome, tools, and dependencies
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    curl \
+    bash
+
+# Set Chrome path for Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+WORKDIR /app
+
+# Copy test runner package.json
+COPY test-runner-package.json ./package.json
+
+# Install test dependencies
+RUN npm install
+
+# Copy test suites
+COPY test-suites ./test-suites
+
+# Create directories for reports
+RUN mkdir -p test-reports test-screenshots
+
+# Make test runner executable
+RUN chmod +x /app/test-suites/run-all-tests.sh
+
+CMD ["/app/test-suites/run-all-tests.sh"]

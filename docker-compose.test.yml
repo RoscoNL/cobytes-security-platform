@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # Test Database
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: cobytes-postgres-test
+    environment:
+      POSTGRES_DB: cobytes_test_db
+      POSTGRES_USER: cobytes_test_user
+      POSTGRES_PASSWORD: cobytes_test_password
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cobytes_test_user -d cobytes_test_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - cobytes-test-network
+
+  # Test Redis
+  redis-test:
+    image: redis:7-alpine
+    container_name: cobytes-redis-test
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    networks:
+      - cobytes-test-network
+
+  # Backend for Testing
+  backend-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    container_name: cobytes-backend-test
+    environment:
+      NODE_ENV: test
+      PORT: 3001
+      DATABASE_URL: postgresql://cobytes_test_user:cobytes_test_password@postgres-test:5432/cobytes_test_db
+      REDIS_URL: redis://redis-test:6379
+      JWT_SECRET: test-jwt-secret
+      JWT_REFRESH_SECRET: test-refresh-secret
+      SESSION_SECRET: test-session-secret
+      SECURITY_API_KEY: test-api-key
+      SECURITY_API_URL: https://app.pentest-tools.com/api/v2
+      CORS_ORIGIN: http://localhost:3002
+      FRONTEND_URL: http://localhost:3002
+      USE_MOCK_SCANNER: "true"
+      TEST_MODE: "true"
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/tests:/app/tests
+      - ./test-reports:/app/test-reports
+      - /app/node_modules
+    networks:
+      - cobytes-test-network
+    command: sh -c "npm run migrate && npm run test:watch"
+
+  # Frontend for Testing
+  frontend-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.test
+    container_name: cobytes-frontend-test
+    environment:
+      NODE_ENV: test
+      PORT: 3002
+      REACT_APP_API_URL: http://backend-test:3001/api
+      REACT_APP_WS_URL: ws://backend-test:3001
+      CI: "true"
+    depends_on:
+      - backend-test
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./test-reports:/app/test-reports
+      - /app/node_modules
+    networks:
+      - cobytes-test-network
+
+  # Test Runner Container
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test-runner
+    container_name: cobytes-test-runner
+    environment:
+      BACKEND_URL: http://backend-test:3001
+      FRONTEND_URL: http://frontend-test:3002
+      DATABASE_URL: postgresql://cobytes_test_user:cobytes_test_password@postgres-test:5432/cobytes_test_db
+    depends_on:
+      - backend-test
+      - frontend-test
+    volumes:
+      - ./test-suites:/app/test-suites
+      - ./test-reports:/app/test-reports
+      - ./test-screenshots:/app/test-screenshots
+    networks:
+      - cobytes-test-network
+    command: npm test
+
+networks:
+  cobytes-test-network:
+    driver: bridge
+
+volumes:
+  test-reports:
+  test-screenshots:

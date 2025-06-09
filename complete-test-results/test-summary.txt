@@ -1,0 +1,445 @@
+
+COBYTES SECURITY PLATFORM - COMPLETE TEST RESULTS
+================================================
+Date: 6/9/2025, 2:12:06 PM
+
+NAVIGATION TEST RESULTS
+----------------------
+✅ /dashboard: PASSED
+✅ /scans: PASSED
+✅ /scans/new: PASSED
+✅ /reports: PASSED
+✅ /security-dashboard: PASSED
+❌ /all-scanners: FAILED - 404
+✅ /products: PASSED
+✅ /cart: PASSED
+✅ /orders: PASSED
+
+SCAN CREATION RESULTS
+--------------------
+
+
+SCAN PROGRESS
+-------------
+
+
+REPORT GENERATION
+----------------
+
+
+ERRORS DETECTED
+--------------
+- console: Warning: validateDOMNesting(...): %s cannot appear as a descendant of <%s>.%s <div> p 
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at p
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Typography (http://localhost:3002/static/js/bundle.js:32086:92)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at ListItemText (http://localhost:3002/static/js/bundle.js:18334:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at li
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at ListItem (http://localhost:3002/static/js/bundle.js:17217:88)
+    at ul
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at List (http://localhost:3002/static/js/bundle.js:16910:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at CardContent (http://localhost:3002/static/js/bundle.js:8137:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Paper (http://localhost:3002/static/js/bundle.js:21287:88)
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Card (http://localhost:3002/static/js/bundle.js:7858:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Grid (http://localhost:3002/static/js/bundle.js:13898:92)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Grid (http://localhost:3002/static/js/bundle.js:13898:92)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Container (http://localhost:3002/static/js/bundle.js:34824:19)
+    at Dashboard (http://localhost:3002/static/js/bundle.js:109091:81)
+    at ProtectedRoute (http://localhost:3002/static/js/bundle.js:105771:3)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Outlet (http://localhost:3002/static/js/bundle.js:91588:26)
+    at main
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at Layout (http://localhost:3002/static/js/bundle.js:105093:81)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Routes (http://localhost:3002/static/js/bundle.js:91675:5)
+    at Router (http://localhost:3002/static/js/bundle.js:91609:15)
+    at BrowserRouter (http://localhost:3002/static/js/bundle.js:89510:5)
+    at ErrorBoundary (http://localhost:3002/static/js/bundle.js:104881:5)
+    at DefaultPropsProvider (http://localhost:3002/static/js/bundle.js:34896:3)
+    at RtlProvider (http://localhost:3002/static/js/bundle.js:35041:7)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:33763:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:35332:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:38229:14)
+    at App
+- console: Warning: Failed %s type: %s%s prop Invalid prop `value` of type `string` supplied to `ForwardRef(LinearProgress)`, expected `number`. 
+    at LinearProgress (http://localhost:3002/static/js/bundle.js:16698:88)
+    at ScanList (http://localhost:3002/static/js/bundle.js:118068:81)
+    at ProtectedRoute (http://localhost:3002/static/js/bundle.js:105771:3)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Outlet (http://localhost:3002/static/js/bundle.js:91588:26)
+    at main
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at Layout (http://localhost:3002/static/js/bundle.js:105093:81)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Routes (http://localhost:3002/static/js/bundle.js:91675:5)
+    at Router (http://localhost:3002/static/js/bundle.js:91609:15)
+    at BrowserRouter (http://localhost:3002/static/js/bundle.js:89510:5)
+    at ErrorBoundary (http://localhost:3002/static/js/bundle.js:104881:5)
+    at DefaultPropsProvider (http://localhost:3002/static/js/bundle.js:34896:3)
+    at RtlProvider (http://localhost:3002/static/js/bundle.js:35041:7)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:33763:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:35332:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:38229:14)
+    at App
+- console: Warning: Received `%s` for a non-boolean attribute `%s`.
+
+If you want to write it to the DOM, pass a string instead: %s="%s" or %s={value.toString()}.%s true animated animated true animated 
+    at span
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at LinearProgress (http://localhost:3002/static/js/bundle.js:16698:88)
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at ScanProgressBar (http://localhost:3002/static/js/bundle.js:106102:3)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at CardContent (http://localhost:3002/static/js/bundle.js:8137:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Paper (http://localhost:3002/static/js/bundle.js:21287:88)
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Card (http://localhost:3002/static/js/bundle.js:7858:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Grid (http://localhost:3002/static/js/bundle.js:13898:92)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Grid (http://localhost:3002/static/js/bundle.js:13898:92)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at TabPanel (http://localhost:3002/static/js/bundle.js:118040:5)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Container (http://localhost:3002/static/js/bundle.js:34824:19)
+    at ScanList (http://localhost:3002/static/js/bundle.js:118068:81)
+    at ProtectedRoute (http://localhost:3002/static/js/bundle.js:105771:3)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Outlet (http://localhost:3002/static/js/bundle.js:91588:26)
+    at main
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at Layout (http://localhost:3002/static/js/bundle.js:105093:81)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Routes (http://localhost:3002/static/js/bundle.js:91675:5)
+    at Router (http://localhost:3002/static/js/bundle.js:91609:15)
+    at BrowserRouter (http://localhost:3002/static/js/bundle.js:89510:5)
+    at ErrorBoundary (http://localhost:3002/static/js/bundle.js:104881:5)
+    at DefaultPropsProvider (http://localhost:3002/static/js/bundle.js:34896:3)
+    at RtlProvider (http://localhost:3002/static/js/bundle.js:35041:7)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:33763:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:35332:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:38229:14)
+    at App
+- console: The above error occurred in the <MuiChipRoot> component:
+
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Chip (http://localhost:3002/static/js/bundle.js:8793:88)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at td
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableCell (http://localhost:3002/static/js/bundle.js:28690:88)
+    at tr
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableRow (http://localhost:3002/static/js/bundle.js:29185:87)
+    at tbody
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableBody (http://localhost:3002/static/js/bundle.js:28485:87)
+    at table
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Table (http://localhost:3002/static/js/bundle.js:28265:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Paper (http://localhost:3002/static/js/bundle.js:21287:88)
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableContainer (http://localhost:3002/static/js/bundle.js:28886:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Container (http://localhost:3002/static/js/bundle.js:34824:19)
+    at Reports (http://localhost:3002/static/js/bundle.js:115544:80)
+    at ProtectedRoute (http://localhost:3002/static/js/bundle.js:105771:3)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Outlet (http://localhost:3002/static/js/bundle.js:91588:26)
+    at main
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at Layout (http://localhost:3002/static/js/bundle.js:105093:81)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Routes (http://localhost:3002/static/js/bundle.js:91675:5)
+    at Router (http://localhost:3002/static/js/bundle.js:91609:15)
+    at BrowserRouter (http://localhost:3002/static/js/bundle.js:89510:5)
+    at ErrorBoundary (http://localhost:3002/static/js/bundle.js:104881:5)
+    at DefaultPropsProvider (http://localhost:3002/static/js/bundle.js:34896:3)
+    at RtlProvider (http://localhost:3002/static/js/bundle.js:35041:7)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:33763:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:35332:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:38229:14)
+    at App
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+- console: Error caught by boundary: JSHandle@error JSHandle@object
+- console: The above error occurred in the <MuiChipRoot> component:
+
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Chip (http://localhost:3002/static/js/bundle.js:8793:88)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at td
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableCell (http://localhost:3002/static/js/bundle.js:28690:88)
+    at tr
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableRow (http://localhost:3002/static/js/bundle.js:29185:87)
+    at tbody
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableBody (http://localhost:3002/static/js/bundle.js:28485:87)
+    at table
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Table (http://localhost:3002/static/js/bundle.js:28265:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Paper (http://localhost:3002/static/js/bundle.js:21287:88)
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableContainer (http://localhost:3002/static/js/bundle.js:28886:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Container (http://localhost:3002/static/js/bundle.js:34824:19)
+    at Reports (http://localhost:3002/static/js/bundle.js:115544:80)
+    at ProtectedRoute (http://localhost:3002/static/js/bundle.js:105771:3)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Outlet (http://localhost:3002/static/js/bundle.js:91588:26)
+    at main
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at Layout (http://localhost:3002/static/js/bundle.js:105093:81)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Routes (http://localhost:3002/static/js/bundle.js:91675:5)
+    at Router (http://localhost:3002/static/js/bundle.js:91609:15)
+    at BrowserRouter (http://localhost:3002/static/js/bundle.js:89510:5)
+    at ErrorBoundary (http://localhost:3002/static/js/bundle.js:104881:5)
+    at DefaultPropsProvider (http://localhost:3002/static/js/bundle.js:34896:3)
+    at RtlProvider (http://localhost:3002/static/js/bundle.js:35041:7)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:33763:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:35332:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:38229:14)
+    at App
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+- console: Error caught by boundary: JSHandle@error JSHandle@object
+- console: The above error occurred in the <MuiChipRoot> component:
+
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Chip (http://localhost:3002/static/js/bundle.js:8793:88)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at td
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableCell (http://localhost:3002/static/js/bundle.js:28690:88)
+    at tr
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableRow (http://localhost:3002/static/js/bundle.js:29185:87)
+    at tbody
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableBody (http://localhost:3002/static/js/bundle.js:28485:87)
+    at table
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Table (http://localhost:3002/static/js/bundle.js:28265:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Paper (http://localhost:3002/static/js/bundle.js:21287:88)
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableContainer (http://localhost:3002/static/js/bundle.js:28886:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Container (http://localhost:3002/static/js/bundle.js:34824:19)
+    at Reports (http://localhost:3002/static/js/bundle.js:115544:80)
+    at ProtectedRoute (http://localhost:3002/static/js/bundle.js:105771:3)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Outlet (http://localhost:3002/static/js/bundle.js:91588:26)
+    at main
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at Layout (http://localhost:3002/static/js/bundle.js:105093:81)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Routes (http://localhost:3002/static/js/bundle.js:91675:5)
+    at Router (http://localhost:3002/static/js/bundle.js:91609:15)
+    at BrowserRouter (http://localhost:3002/static/js/bundle.js:89510:5)
+    at ErrorBoundary (http://localhost:3002/static/js/bundle.js:104881:5)
+    at DefaultPropsProvider (http://localhost:3002/static/js/bundle.js:34896:3)
+    at RtlProvider (http://localhost:3002/static/js/bundle.js:35041:7)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:33763:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:35332:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:38229:14)
+    at App
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+- console: Error caught by boundary: JSHandle@error JSHandle@object
+- console: The above error occurred in the <MuiChipRoot> component:
+
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Chip (http://localhost:3002/static/js/bundle.js:8793:88)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at td
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableCell (http://localhost:3002/static/js/bundle.js:28690:88)
+    at tr
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableRow (http://localhost:3002/static/js/bundle.js:29185:87)
+    at tbody
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableBody (http://localhost:3002/static/js/bundle.js:28485:87)
+    at table
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Table (http://localhost:3002/static/js/bundle.js:28265:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Paper (http://localhost:3002/static/js/bundle.js:21287:88)
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableContainer (http://localhost:3002/static/js/bundle.js:28886:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Container (http://localhost:3002/static/js/bundle.js:34824:19)
+    at Reports (http://localhost:3002/static/js/bundle.js:115544:80)
+    at ProtectedRoute (http://localhost:3002/static/js/bundle.js:105771:3)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Outlet (http://localhost:3002/static/js/bundle.js:91588:26)
+    at main
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at Layout (http://localhost:3002/static/js/bundle.js:105093:81)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Routes (http://localhost:3002/static/js/bundle.js:91675:5)
+    at Router (http://localhost:3002/static/js/bundle.js:91609:15)
+    at BrowserRouter (http://localhost:3002/static/js/bundle.js:89510:5)
+    at ErrorBoundary (http://localhost:3002/static/js/bundle.js:104881:5)
+    at DefaultPropsProvider (http://localhost:3002/static/js/bundle.js:34896:3)
+    at RtlProvider (http://localhost:3002/static/js/bundle.js:35041:7)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:33763:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:35332:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:38229:14)
+    at App
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+- console: Error caught by boundary: JSHandle@error JSHandle@object
+- console: The above error occurred in the <MuiChipRoot> component:
+
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Chip (http://localhost:3002/static/js/bundle.js:8793:88)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at td
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableCell (http://localhost:3002/static/js/bundle.js:28690:88)
+    at tr
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableRow (http://localhost:3002/static/js/bundle.js:29185:87)
+    at tbody
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableBody (http://localhost:3002/static/js/bundle.js:28485:87)
+    at table
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Table (http://localhost:3002/static/js/bundle.js:28265:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Paper (http://localhost:3002/static/js/bundle.js:21287:88)
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at TableContainer (http://localhost:3002/static/js/bundle.js:28886:87)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Container (http://localhost:3002/static/js/bundle.js:34824:19)
+    at Reports (http://localhost:3002/static/js/bundle.js:115544:80)
+    at ProtectedRoute (http://localhost:3002/static/js/bundle.js:105771:3)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Outlet (http://localhost:3002/static/js/bundle.js:91588:26)
+    at main
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at div
+    at http://localhost:3002/static/js/bundle.js:909:66
+    at Box (http://localhost:3002/static/js/bundle.js:36105:72)
+    at Layout (http://localhost:3002/static/js/bundle.js:105093:81)
+    at RenderedRoute (http://localhost:3002/static/js/bundle.js:90941:5)
+    at Routes (http://localhost:3002/static/js/bundle.js:91675:5)
+    at Router (http://localhost:3002/static/js/bundle.js:91609:15)
+    at BrowserRouter (http://localhost:3002/static/js/bundle.js:89510:5)
+    at ErrorBoundary (http://localhost:3002/static/js/bundle.js:104881:5)
+    at DefaultPropsProvider (http://localhost:3002/static/js/bundle.js:34896:3)
+    at RtlProvider (http://localhost:3002/static/js/bundle.js:35041:7)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:33763:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:35332:5)
+    at ThemeProvider (http://localhost:3002/static/js/bundle.js:38229:14)
+    at App
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+- console: Error caught by boundary: JSHandle@error JSHandle@object
+- console: Failed to load resource: the server responded with a status of 404 (Not Found)
+- console: Failed to load resource: the server responded with a status of 404 (Not Found)
+- console: API GET error: JSHandle@object
+- console: API GET error: JSHandle@object
+
+SUMMARY
+-------
+✅ Passed: 8
+❌ Failed: 1
+
+Test results saved to: /Users/jeroenvanrossum/Documents/Claude/cobytes-security-platform/complete-test-results

@@ -17,274 +17,302 @@ import {
   CardContent,
   Chip,
   CircularProgress,
+  Stepper,
+  Step,
+  StepLabel,
 } from '@mui/material';
 import {
   Security as SecurityIcon,
   Language as WebIcon,
   Dns as DnsIcon,
   VpnLock as NetworkIcon,
-  Code as ApiIcon,
+  Code as CodeIcon,
   Shield as ShieldIcon,
+  CheckCircle as CheckIcon,
 } from '@mui/icons-material';
+import axios from 'axios';
 
-// Import the proxy service since direct CORS doesn't work
-const PROXY_URL = 'https://thingproxy.freeboard.io/fetch/';
-const PENTEST_API = 'https://app.pentest-tools.com/api/v2';
-const API_KEY = '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
-// All available scanners
-const SCANNERS = [
+// Available scan types
+const SCAN_TYPES = [
   {
     category: 'CMS Security',
     icon: <WebIcon />,
-    tools: [
-      { id: 270, name: 'WordPress Scanner', description: 'Scan WordPress sites for vulnerabilities' },
-      { id: 280, name: 'Drupal Scanner', description: 'Scan Drupal sites for vulnerabilities' },
-      { id: 290, name: 'Joomla Scanner', description: 'Scan Joomla sites for vulnerabilities' },
-      { id: 260, name: 'SharePoint Scanner', description: 'Scan SharePoint sites for vulnerabilities' },
+    types: [
+      { id: 'wordpress', name: 'WordPress Scanner', description: 'Scan WordPress sites for vulnerabilities' },
+      { id: 'drupal', name: 'Drupal Scanner', description: 'Scan Drupal sites for vulnerabilities' },
+      { id: 'joomla', name: 'Joomla Scanner', description: 'Scan Joomla sites for vulnerabilities' },
     ]
   },
   {
     category: 'Web Security',
     icon: <SecurityIcon />,
-    tools: [
-      { id: 170, name: 'Website Scanner', description: 'Comprehensive website vulnerability scan' },
-      { id: 110, name: 'SSL Scanner', description: 'SSL/TLS configuration analysis' },
-      { id: 120, name: 'HTTP Headers', description: 'Security headers analysis' },
-      { id: 180, name: 'WAF Detector', description: 'Web Application Firewall detection' },
-      { id: 310, name: 'Website Recon', description: 'Website reconnaissance and information gathering' },
-      { id: 90, name: 'URL Fuzzer', description: 'Discover hidden files and directories' },
+    types: [
+      { id: 'website', name: 'Website Scanner', description: 'Comprehensive website vulnerability scan' },
+      { id: 'ssl', name: 'SSL Scanner', description: 'SSL/TLS configuration analysis' },
+      { id: 'headers', name: 'HTTP Headers', description: 'Security headers analysis' },
     ]
   },
   {
     category: 'Network Security',
     icon: <NetworkIcon />,
-    tools: [
-      { id: 350, name: 'Network Scanner', description: 'Comprehensive network vulnerability scanning' },
-      { id: 70, name: 'TCP Port Scanner', description: 'Scan TCP ports' },
-      { id: 80, name: 'UDP Port Scanner', description: 'Scan UDP ports' },
-      { id: 100, name: 'Ping Host', description: 'Check host availability' },
+    types: [
+      { id: 'network', name: 'Network Scanner', description: 'Comprehensive network vulnerability scanning' },
+      { id: 'port_scan', name: 'Port Scanner', description: 'Scan TCP/UDP ports' },
     ]
   },
   {
     category: 'Domain & DNS',
     icon: <DnsIcon />,
-    tools: [
-      { id: 20, name: 'Subdomain Finder', description: 'Discover subdomains' },
-      { id: 50, name: 'DNS Lookup', description: 'DNS records analysis' },
-      { id: 60, name: 'DNS Zone Transfer', description: 'Check for DNS zone transfer' },
-      { id: 40, name: 'Whois Lookup', description: 'Domain registration information' },
-      { id: 390, name: 'Domain Finder', description: 'Find related domains' },
-    ]
-  },
-  {
-    category: 'Advanced Security',
-    icon: <ShieldIcon />,
-    tools: [
-      { id: 490, name: 'Sniper', description: 'Advanced vulnerability scanner' },
-      { id: 510, name: 'API Scanner', description: 'API security testing' },
-      { id: 520, name: 'Cloud Scanner', description: 'Cloud infrastructure security' },
-      { id: 540, name: 'Kubernetes Scanner', description: 'Kubernetes security assessment' },
-      { id: 400, name: 'Password Auditor', description: 'Password strength testing' },
+    types: [
+      { id: 'subdomain', name: 'Subdomain Finder', description: 'Discover subdomains' },
+      { id: 'dns_lookup', name: 'DNS Lookup', description: 'DNS records analysis' },
+      { id: 'whois', name: 'Whois Lookup', description: 'Domain registration information' },
     ]
   },
 ];
 
 const ScanCreate: React.FC = () => {
   const navigate = useNavigate();
+  const [activeStep, setActiveStep] = useState(0);
   const [target, setTarget] = useState('');
-  const [selectedTool, setSelectedTool] = useState<number | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [createdScan, setCreatedScan] = useState<any>(null);
 
-  const makeProxyRequest = async (method: string, endpoint: string, data?: any) => {
-    const url = `${PROXY_URL}${PENTEST_API}${endpoint}`;
-    
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
-      },
-      body: data ? JSON.stringify(data) : undefined,
-    });
+  const steps = ['Enter Target', 'Select Scan Type', 'Confirm & Start'];
 
-    const responseData = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(responseData.message || 'Request failed');
+  const handleNext = () => {
+    if (activeStep === 0 && !target) {
+      setError('Please enter a target URL or IP address');
+      return;
     }
-
-    return responseData;
+    if (activeStep === 1 && !selectedType) {
+      setError('Please select a scan type');
+      return;
+    }
+    setError(null);
+    setActiveStep((prev) => prev + 1);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedTool || !target) return;
+  const handleBack = () => {
+    setError(null);
+    setActiveStep((prev) => prev - 1);
+  };
 
+  const handleStartScan = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // First, create or find target
-      let targetId;
-      try {
-        // Try to get existing targets
-        const targetsResponse = await makeProxyRequest('GET', '/targets');
-        const existingTarget = targetsResponse.data?.find((t: any) => t.name === target);
-        
-        if (existingTarget) {
-          targetId = existingTarget.id;
-        } else {
-          // Create new target
-          const targetResponse = await makeProxyRequest('POST', '/targets', {
-            name: target,
-            description: `Target for security scan`
-          });
-          targetId = targetResponse.data.id;
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${API_URL}/scans`,
+        {
+          target,
+          type: selectedType,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         }
-      } catch (err) {
-        console.log('Could not create target, using target_name');
-      }
+      );
 
-      // Start the scan
-      const scanPayload = {
-        tool_id: selectedTool,
-        target_name: target,
-        ...(targetId && { target_id: targetId }),
-        tool_params: {}
-      };
-
-      const scanResponse = await makeProxyRequest('POST', '/scans', scanPayload);
-      const scanId = scanResponse.data?.created_id || scanResponse.data?.id;
-
-      // Store scan info in localStorage for tracking
-      const scanInfo = {
-        id: scanId,
-        toolId: selectedTool,
-        target,
-        createdAt: new Date().toISOString(),
-        pentestToolsScanId: scanId
-      };
+      const scan = response.data.data;
+      setCreatedScan(scan);
       
-      const existingScans = JSON.parse(localStorage.getItem('pentesttools_scans') || '[]');
-      existingScans.push(scanInfo);
-      localStorage.setItem('pentesttools_scans', JSON.stringify(existingScans));
-
-      // Navigate to scan detail page
-      navigate(`/scan-status/${scanId}`);
-
+      // Redirect to scan detail page after 2 seconds
+      setTimeout(() => {
+        navigate(`/scans/${scan.id}`);
+      }, 2000);
     } catch (err: any) {
-      console.error('Scan creation error:', err);
-      setError(err.message || 'Failed to create scan');
-    } finally {
+      console.error('Error creating scan:', err);
+      setError(err.response?.data?.message || 'Failed to create scan');
       setLoading(false);
     }
   };
 
-  const selectedToolInfo = SCANNERS.flatMap(cat => cat.tools).find(tool => tool.id === selectedTool);
+  const getSelectedTypeInfo = () => {
+    for (const category of SCAN_TYPES) {
+      const type = category.types.find(t => t.id === selectedType);
+      if (type) return type;
+    }
+    return null;
+  };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Start New Security Scan
+        Create New Security Scan
       </Typography>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <form onSubmit={handleSubmit}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <TextField
-                  fullWidth
-                  required
-                  label="Target URL or Domain"
-                  value={target}
-                  onChange={(e) => setTarget(e.target.value)}
-                  placeholder="https://example.com or example.com"
-                  helperText="Enter the URL or domain you want to scan"
-                />
+      <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+        {steps.map((label) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
 
-                <FormControl fullWidth required>
-                  <InputLabel>Select Scanner</InputLabel>
-                  <Select
-                    value={selectedTool || ''}
-                    onChange={(e) => setSelectedTool(Number(e.target.value))}
-                    label="Select Scanner"
-                  >
-                    {SCANNERS.map(category => (
-                      <MenuItem key={category.category} disabled sx={{ fontWeight: 'bold' }}>
-                        {category.category}
-                      </MenuItem>
-                    )).concat(
-                      SCANNERS.flatMap(category => 
-                        category.tools.map(tool => (
-                          <MenuItem key={tool.id} value={tool.id} sx={{ pl: 4 }}>
-                            {tool.name}
-                          </MenuItem>
-                        ))
-                      )
-                    )}
-                  </Select>
-                </FormControl>
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
 
-                {selectedToolInfo && (
-                  <Alert severity="info">
-                    {selectedToolInfo.description}
-                  </Alert>
-                )}
+      {createdScan && (
+        <Alert severity="success" sx={{ mb: 3 }}>
+          Scan created successfully! Redirecting to scan details...
+        </Alert>
+      )}
 
-                {error && (
-                  <Alert severity="error">
-                    {error}
-                  </Alert>
-                )}
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  disabled={loading || !target || !selectedTool}
-                  startIcon={loading && <CircularProgress size={20} />}
-                >
-                  {loading ? 'Starting Scan...' : 'Start Scan'}
-                </Button>
-              </Box>
-            </form>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
+      {/* Step 1: Enter Target */}
+      {activeStep === 0 && (
+        <Paper sx={{ p: 4 }}>
           <Typography variant="h6" gutterBottom>
-            Available Scanners
+            Enter Target URL or IP Address
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Enter the website URL, domain name, or IP address you want to scan.
           </Typography>
           
-          {SCANNERS.map(category => (
-            <Card key={category.category} sx={{ mb: 2 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <TextField
+            fullWidth
+            label="Target"
+            placeholder="https://example.com or 192.168.1.1"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            sx={{ mb: 3 }}
+            helperText="Make sure you have permission to scan this target"
+          />
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              onClick={handleNext}
+              disabled={!target}
+            >
+              Next
+            </Button>
+          </Box>
+        </Paper>
+      )}
+
+      {/* Step 2: Select Scan Type */}
+      {activeStep === 1 && (
+        <Paper sx={{ p: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Select Scan Type
+          </Typography>
+          
+          <Grid container spacing={3}>
+            {SCAN_TYPES.map((category) => (
+              <Grid item xs={12} key={category.category}>
+                <Typography variant="subtitle1" sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   {category.icon}
-                  <Typography variant="subtitle1" sx={{ ml: 1, fontWeight: 'bold' }}>
-                    {category.category}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {category.tools.map(tool => (
-                    <Chip
-                      key={tool.id}
-                      label={tool.name}
-                      size="small"
-                      onClick={() => setSelectedTool(tool.id)}
-                      color={selectedTool === tool.id ? 'primary' : 'default'}
-                      clickable
-                    />
+                  <span style={{ marginLeft: 8 }}>{category.category}</span>
+                </Typography>
+                
+                <Grid container spacing={2}>
+                  {category.types.map((type) => (
+                    <Grid item xs={12} md={6} lg={4} key={type.id}>
+                      <Card
+                        sx={{
+                          cursor: 'pointer',
+                          border: selectedType === type.id ? '2px solid' : '1px solid',
+                          borderColor: selectedType === type.id ? 'primary.main' : 'divider',
+                          '&:hover': {
+                            borderColor: 'primary.main',
+                            boxShadow: 2,
+                          },
+                        }}
+                        onClick={() => setSelectedType(type.id)}
+                      >
+                        <CardContent>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                            <Typography variant="subtitle2" gutterBottom>
+                              {type.name}
+                            </Typography>
+                            {selectedType === type.id && (
+                              <CheckIcon color="primary" />
+                            )}
+                          </Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {type.description}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
                   ))}
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
-        </Grid>
-      </Grid>
+                </Grid>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+            <Button onClick={handleBack}>
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleNext}
+              disabled={!selectedType}
+            >
+              Next
+            </Button>
+          </Box>
+        </Paper>
+      )}
+
+      {/* Step 3: Confirm & Start */}
+      {activeStep === 2 && (
+        <Paper sx={{ p: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Confirm Scan Details
+          </Typography>
+          
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="body2" color="text.secondary">
+              Target
+            </Typography>
+            <Typography variant="h6" gutterBottom>
+              {target}
+            </Typography>
+            
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              Scan Type
+            </Typography>
+            <Typography variant="h6">
+              {getSelectedTypeInfo()?.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {getSelectedTypeInfo()?.description}
+            </Typography>
+          </Box>
+
+          <Alert severity="info" sx={{ mb: 3 }}>
+            The scan will start immediately after confirmation. You'll be redirected to the scan details page where you can monitor progress.
+          </Alert>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button onClick={handleBack} disabled={loading}>
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleStartScan}
+              disabled={loading}
+              startIcon={loading ? <CircularProgress size={20} /> : <SecurityIcon />}
+            >
+              {loading ? 'Creating Scan...' : 'Start Scan'}
+            </Button>
+          </Box>
+        </Paper>
+      )}
     </Container>
   );
 };

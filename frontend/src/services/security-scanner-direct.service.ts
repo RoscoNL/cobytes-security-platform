@@ -1,7 +1,7 @@
 // Direct CORS implementation for Security Scanner API v2
 // CORS is supported for direct API access
 
-const API_KEY = process.env.REACT_APP_SCANNER_API_KEY || '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
+const API_KEY = process.env.REACT_APP_SCANNER_API_KEY || 'E0Eq4lmxoJeMSd6DIGLiqCW4yGRnJKywjhnXl78r471e4e69';
 const API_URL = 'https://app.pentest-tools.com/api/v2';
 
 export interface Target {

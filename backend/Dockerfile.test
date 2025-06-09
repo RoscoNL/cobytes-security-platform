@@ -1,0 +1,30 @@
+FROM node:18-alpine
+
+# Install dependencies for testing
+RUN apk add --no-cache python3 make g++ postgresql-client chromium
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies including dev dependencies
+RUN npm ci
+
+# Copy application files
+COPY . .
+
+# Build TypeScript
+RUN npm run build
+
+# Create directories
+RUN mkdir -p uploads logs test-reports
+
+# Install testing tools globally
+RUN npm install -g jest @types/jest ts-jest
+
+# Expose port
+EXPOSE 3001
+
+# Default command for tests
+CMD ["npm", "test"]

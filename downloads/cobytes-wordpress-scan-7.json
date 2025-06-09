@@ -1,0 +1,52 @@
+{
+  "id": 7,
+  "target": "https://www.cobytes.com",
+  "type": "wordpress",
+  "status": "completed",
+  "parameters": {},
+  "pentest_tools_scan_id": null,
+  "pentest_tools_target_id": null,
+  "progress": "100.00",
+  "error_message": null,
+  "metadata": null,
+  "user": null,
+  "results": [
+    {
+      "id": 7,
+      "type": "vulnerability",
+      "title": "WordPress Version Disclosure",
+      "description": "WordPress version 6.3.1 detected",
+      "severity": "low",
+      "details": {
+        "version": "6.3.1",
+        "location": "/readme.html"
+      },
+      "affected_component": "https://www.cobytes.com",
+      "recommendation": "Consider hiding version information",
+      "references": null,
+      "cve_id": null,
+      "cvss_score": null,
+      "created_at": "2025-06-09T09:46:46.481Z"
+    },
+    {
+      "id": 8,
+      "type": "vulnerability",
+      "title": "Admin Login Page Accessible",
+      "description": "WordPress admin login page is publicly accessible",
+      "severity": "medium",
+      "details": {
+        "url": "/wp-admin"
+      },
+      "affected_component": "https://www.cobytes.com",
+      "recommendation": "Implement IP whitelisting or additional authentication",
+      "references": null,
+      "cve_id": null,
+      "cvss_score": null,
+      "created_at": "2025-06-09T09:46:46.481Z"
+    }
+  ],
+  "created_at": "2025-06-09T09:46:24.208Z",
+  "updated_at": "2025-06-09T09:46:46.514Z",
+  "started_at": "2025-06-09T11:46:24.306Z",
+  "completed_at": "2025-06-09T11:46:46.499Z"
+}

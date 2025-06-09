@@ -538,8 +538,7 @@ export class ScanController {
 
       const scan = await scanService.createScan(scanData);
       
-      // Store in memory for retrieval
-      freeScans.set(scan.id.toString(), scan);
+      // Don't store in memory - let getFreeScan retrieve from DB
 
       res.status(201).json({
         success: true,
@@ -596,6 +595,91 @@ export class ScanController {
       logger.error('Failed to get free scan', { error });
       res.status(500).json({
         error: 'Failed to get scan',
+        message: error.message
+      });
+    }
+  }
+
+  async generateReport(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { format = 'pdf' } = req.body;
+      
+      logger.info('Generating scan report', { scanId: id, format });
+
+      const scan = await scanService.getScan(parseInt(id));
+      
+      if (!scan) {
+        return res.status(404).json({
+          error: 'Scan not found'
+        });
+      }
+
+      // Check authorization
+      if ((req as any).user && scan.user && scan.user.id !== (req as any).user.id && (req as any).user.role !== 'admin') {
+        return res.status(403).json({
+          error: 'Unauthorized'
+        });
+      }
+
+      if (format === 'pdf') {
+        try {
+          const pdfGeneratorService = await import('../services/pdf-generator.service');
+          const pdfBuffer = await pdfGeneratorService.default.generateScanReport(scan);
+          
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', `attachment; filename="scan-report-${id}.pdf"`);
+          res.send(pdfBuffer);
+        } catch (pdfError) {
+          logger.error('PDF generation failed', { error: pdfError });
+          // Fallback to JSON
+          res.json({
+            success: true,
+            data: scan
+          });
+        }
+      } else {
+        // Return JSON format
+        res.json({
+          success: true,
+          data: scan
+        });
+      }
+    } catch (error: any) {
+      logger.error('Failed to generate report', { error });
+      res.status(500).json({
+        error: 'Failed to generate report',
+        message: error.message
+      });
+    }
+  }
+
+  async updateScanResults(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { status, results, completed_at } = req.body;
+
+      const scanId = parseInt(id);
+      if (isNaN(scanId)) {
+        return res.status(400).json({
+          error: 'Invalid scan ID'
+        });
+      }
+
+      const updatedScan = await scanService.updateScanWithResults(scanId, {
+        status,
+        results,
+        completed_at
+      });
+
+      res.json({
+        success: true,
+        data: updatedScan
+      });
+    } catch (error: any) {
+      logger.error('Failed to update scan results', { error });
+      res.status(500).json({
+        error: 'Failed to update scan results',
         message: error.message
       });
     }

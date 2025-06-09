@@ -30,8 +30,8 @@ router.all('/pentest-tools/*', asyncHandler(async (req: Request, res: Response) 
   });
 
   try {
-    // Use hardcoded API key for testing
-    const apiKey = '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
+    // Use API key from environment variables (production) or fallback to new key
+    const apiKey = process.env.PENTEST_TOOLS_API_KEY || 'E0Eq4lmxoJeMSd6DIGLiqCW4yGRnJKywjhnXl78r471e4e69';
     
     const config: any = {
       method: req.method,

@@ -91,52 +91,16 @@ router.post('/generate', asyncHandler(async (req: Request, res: Response) => {
   
   reports.set(reportId, newReport);
   
-  // Simulate report generation
+  // Real report generation would connect to actual scan data
+  // For now, return error as we don't have real implementation yet
   setTimeout(() => {
     const report = reports.get(reportId);
     if (report) {
-      report.status = 'completed';
+      report.status = 'failed';
       report.updatedAt = new Date();
-      report.size = Math.floor(Math.random() * 1000000) + 100000; // Random size between 100KB and 1MB
-      report.downloadUrl = `/api/reports/${reportId}/download`;
-      
-      // Add mock report content
-      report.content = {
-        summary: {
-          totalVulnerabilities: 15,
-          criticalCount: 2,
-          highCount: 5,
-          mediumCount: 6,
-          lowCount: 2,
-          scanDate: new Date(),
-          targetCount: reportRequest.scanIds.length
-        },
-        vulnerabilities: [
-          {
-            severity: 'critical',
-            title: 'Remote Code Execution',
-            cve: 'CVE-2024-1234',
-            description: 'Unauthenticated remote code execution vulnerability',
-            affectedAssets: ['192.168.1.100', '192.168.1.101'],
-            recommendation: 'Apply security patch immediately'
-          },
-          {
-            severity: 'high',
-            title: 'SQL Injection',
-            cwe: 'CWE-89',
-            description: 'SQL injection vulnerability in login form',
-            affectedAssets: ['https://example.com/login'],
-            recommendation: 'Use parameterized queries'
-          }
-        ],
-        recommendations: [
-          'Implement regular security patching schedule',
-          'Enable Web Application Firewall (WAF)',
-          'Conduct regular security assessments'
-        ]
-      };
+      report.error = 'Report generation not yet implemented - requires real scan data integration';
     }
-  }, 3000); // Generate after 3 seconds
+  }, 1000);
   
   res.status(202).json({
     success: true,
@@ -167,17 +131,10 @@ router.get('/:reportId/download', asyncHandler(async (req: Request, res: Respons
     });
   }
   
-  // In a real app, this would serve the actual file
-  // For demo, we'll return the report content as JSON
-  res.json({
-    success: true,
-    data: {
-      reportId: report.reportId,
-      name: report.name,
-      format: report.format,
-      content: report.content,
-      generatedAt: report.updatedAt
-    }
+  // Return error as we don't have real report content
+  return res.status(501).json({
+    success: false,
+    error: 'Report download not implemented - requires real scan data integration'
   });
 }));
 

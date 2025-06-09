@@ -37,7 +37,7 @@ const OrderSuccess: React.FC = () => {
 
   const fetchOrder = async () => {
     try {
-      const response = await api.get(`/api/orders/${orderId}`);
+      const response = await api.get(`/orders/${orderId}`);
       setOrder(response.data.data);
     } catch (error: any) {
       console.error('Error fetching order:', error);
