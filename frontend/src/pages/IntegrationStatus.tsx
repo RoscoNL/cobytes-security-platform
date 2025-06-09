@@ -22,7 +22,7 @@ import {
   PendingOutlined,
   PlayArrowOutlined,
 } from '@mui/icons-material';
-import { pentestToolsProxyService, ProxyPentestToolId } from '../services/pentesttools-proxy.service';
+import { securityScannerProxyService, ProxySecurityToolId } from '../services/security-scanner-proxy.service';
 import scanService from '../services/scan.service';
 
 interface IntegrationItem {
@@ -41,10 +41,10 @@ const IntegrationStatus: React.FC = () => {
     {
       name: 'CORS Proxy Setup',
       status: 'completed',
-      description: 'Using thingproxy.freeboard.io as CORS proxy for PentestTools API',
+      description: 'Using thingproxy.freeboard.io as CORS proxy for Security Scanner API',
       testFunction: async () => {
         try {
-          const targets = await pentestToolsProxyService.getTargets();
+          const targets = await securityScannerProxyService.getTargets();
           return true;
         } catch {
           return false;
@@ -52,12 +52,12 @@ const IntegrationStatus: React.FC = () => {
       }
     },
     {
-      name: 'PentestTools API Authentication',
+      name: 'Security Scanner API Authentication',
       status: 'completed',
       description: 'API key configured and working',
       testFunction: async () => {
         try {
-          const targets = await pentestToolsProxyService.getTargets();
+          const targets = await securityScannerProxyService.getTargets();
           return true;
         } catch {
           return false;
@@ -70,10 +70,10 @@ const IntegrationStatus: React.FC = () => {
       description: 'WordPress scanner (ID: 270) integrated with cobytes.com test',
       testFunction: async () => {
         try {
-          const { scan_id } = await pentestToolsProxyService.startWordPressScan('https://www.cobytes.com');
+          const { scan_id } = await securityScannerProxyService.startWordPressScan('https://www.cobytes.com');
           if (scan_id) {
             // Stop the test scan to avoid consuming resources
-            await pentestToolsProxyService.stopScan(scan_id);
+            await securityScannerProxyService.stopScan(scan_id);
             return true;
           }
           return false;
@@ -85,17 +85,17 @@ const IntegrationStatus: React.FC = () => {
     {
       name: 'All 40+ Scanners Added',
       status: 'completed',
-      description: 'All PentestTools scanners available in AllScannersNew page'
+      description: 'All security scanners available in AllScannersNew page'
     },
     {
       name: 'Scan Service Integration',
       status: 'completed',
-      description: 'scan.service.ts updated with createPentestToolsScan method'
+      description: 'scan.service.ts updated with createSecurityScan method'
     },
     {
       name: 'ScanNew Page Integration',
       status: 'completed',
-      description: 'ScanNew page includes all PentestTools scanners'
+      description: 'ScanNew page includes all security scanners'
     },
     {
       name: 'Real-time Progress Tracking',
@@ -109,27 +109,27 @@ const IntegrationStatus: React.FC = () => {
     }
   ];
 
-  const pentestToolsScanners = [
-    { id: ProxyPentestToolId.WORDPRESS_SCANNER, name: 'WordPress Scanner' },
-    { id: ProxyPentestToolId.SUBDOMAIN_FINDER, name: 'Subdomain Finder' },
-    { id: ProxyPentestToolId.WEBSITE_SCANNER, name: 'Website Scanner' },
-    { id: ProxyPentestToolId.SSL_SCANNER, name: 'SSL/TLS Scanner' },
-    { id: ProxyPentestToolId.TCP_PORT_SCANNER, name: 'TCP Port Scanner' },
-    { id: ProxyPentestToolId.UDP_PORT_SCANNER, name: 'UDP Port Scanner' },
-    { id: ProxyPentestToolId.URL_FUZZER, name: 'URL Fuzzer' },
-    { id: ProxyPentestToolId.FIND_VHOSTS, name: 'Virtual Host Finder' },
-    { id: ProxyPentestToolId.WEBSITE_RECON, name: 'Website Recon' },
-    { id: ProxyPentestToolId.NETWORK_SCANNER, name: 'Network Scanner' },
-    { id: ProxyPentestToolId.DOMAIN_FINDER, name: 'Domain Finder' },
-    { id: ProxyPentestToolId.PASSWORD_AUDITOR, name: 'Password Auditor' },
-    { id: ProxyPentestToolId.WAF_DETECTOR, name: 'WAF Detector' },
-    { id: ProxyPentestToolId.API_SCANNER, name: 'API Scanner' },
-    { id: ProxyPentestToolId.DRUPAL_SCANNER, name: 'Drupal Scanner' },
-    { id: ProxyPentestToolId.JOOMLA_SCANNER, name: 'Joomla Scanner' },
-    { id: ProxyPentestToolId.SHARE_POINT_SCANNER, name: 'SharePoint Scanner' },
-    { id: ProxyPentestToolId.SNIPER, name: 'Sniper' },
-    { id: ProxyPentestToolId.CLOUD_SCANNER, name: 'Cloud Scanner' },
-    { id: ProxyPentestToolId.KUBERNETES_SCANNER, name: 'Kubernetes Scanner' },
+  const securityScanners = [
+    { id: ProxySecurityToolId.WORDPRESS_SCANNER, name: 'WordPress Scanner' },
+    { id: ProxySecurityToolId.SUBDOMAIN_FINDER, name: 'Subdomain Finder' },
+    { id: ProxySecurityToolId.WEBSITE_SCANNER, name: 'Website Scanner' },
+    { id: ProxySecurityToolId.SSL_SCANNER, name: 'SSL/TLS Scanner' },
+    { id: ProxySecurityToolId.TCP_PORT_SCANNER, name: 'TCP Port Scanner' },
+    { id: ProxySecurityToolId.UDP_PORT_SCANNER, name: 'UDP Port Scanner' },
+    { id: ProxySecurityToolId.URL_FUZZER, name: 'URL Fuzzer' },
+    { id: ProxySecurityToolId.FIND_VHOSTS, name: 'Virtual Host Finder' },
+    { id: ProxySecurityToolId.WEBSITE_RECON, name: 'Website Recon' },
+    { id: ProxySecurityToolId.NETWORK_SCANNER, name: 'Network Scanner' },
+    { id: ProxySecurityToolId.DOMAIN_FINDER, name: 'Domain Finder' },
+    { id: ProxySecurityToolId.PASSWORD_AUDITOR, name: 'Password Auditor' },
+    { id: ProxySecurityToolId.WAF_DETECTOR, name: 'WAF Detector' },
+    { id: ProxySecurityToolId.API_SCANNER, name: 'API Scanner' },
+    { id: ProxySecurityToolId.DRUPAL_SCANNER, name: 'Drupal Scanner' },
+    { id: ProxySecurityToolId.JOOMLA_SCANNER, name: 'Joomla Scanner' },
+    { id: ProxySecurityToolId.SHARE_POINT_SCANNER, name: 'SharePoint Scanner' },
+    { id: ProxySecurityToolId.SNIPER, name: 'Sniper' },
+    { id: ProxySecurityToolId.CLOUD_SCANNER, name: 'Cloud Scanner' },
+    { id: ProxySecurityToolId.KUBERNETES_SCANNER, name: 'Kubernetes Scanner' },
   ];
 
   const runTests = async () => {
@@ -167,11 +167,11 @@ const IntegrationStatus: React.FC = () => {
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          PentestTools Integration Status
+          Security Scanner Integration Status
         </Typography>
         
         <Alert severity="success" sx={{ mb: 3 }}>
-          All scanners are integrated with the PentestTools API using a working CORS proxy. No mock data!
+          All scanners are integrated with the Security Scanner API using a working CORS proxy. No mock data!
         </Alert>
 
         <Grid container spacing={3}>
@@ -221,11 +221,11 @@ const IntegrationStatus: React.FC = () => {
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Available PentestTools Scanners ({pentestToolsScanners.length})
+                  Available Security Scanners ({securityScanners.length})
                 </Typography>
                 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
-                  {pentestToolsScanners.map((scanner) => (
+                  {securityScanners.map((scanner) => (
                     <Chip 
                       key={scanner.id}
                       label={`${scanner.name} (ID: ${scanner.id})`}
@@ -276,10 +276,10 @@ const IntegrationStatus: React.FC = () => {
           </Typography>
           <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace' }}>
 {`// Test WordPress Scanner
-await pentestToolsProxyService.startWordPressScan('https://www.cobytes.com')
+await securityScannerProxyService.startWordPressScan('https://www.cobytes.com')
 
 // Test any scanner
-await pentestToolsProxyService.startScan({
+await securityScannerProxyService.startScan({
   tool_id: 270, // WordPress Scanner
   target_name: 'https://www.cobytes.com',
   tool_params: {}

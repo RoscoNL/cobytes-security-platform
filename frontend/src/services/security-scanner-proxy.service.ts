@@ -1,5 +1,5 @@
-// PentestTools API client that uses CORS proxy
-const PENTEST_TOOLS_BASE = 'https://app.pentest-tools.com/api/v2';
+// Security Scanner API client that uses CORS proxy
+const SCANNER_API_BASE = 'https://app.pentest-tools.com/api/v2';
 
 export interface ProxyTarget {
   id: number;
@@ -28,8 +28,8 @@ export interface ProxyScanOptions {
   tool_params: Record<string, any>;
 }
 
-// Tool IDs from PentestTools API (from sample client)
-export const ProxyPentestToolId = {
+// Tool IDs for security scanners
+export const ProxySecurityToolId = {
   SUBDOMAIN_FINDER: 20,
   TCP_PORT_SCANNER: 70,
   UDP_PORT_SCANNER: 80,
@@ -52,7 +52,7 @@ export const ProxyPentestToolId = {
   KUBERNETES_SCANNER: 540,
 };
 
-class PentestToolsProxyService {
+class SecurityScannerProxyService {
   private apiKey: string;
 
   constructor() {
@@ -61,7 +61,7 @@ class PentestToolsProxyService {
   }
 
   private buildProxyUrl(path: string): string {
-    const targetUrl = `${PENTEST_TOOLS_BASE}${path}`;
+    const targetUrl = `${SCANNER_API_BASE}${path}`;
     // Use thingproxy.freeboard.io which works without API key
     return `https://thingproxy.freeboard.io/fetch/${targetUrl}`;
   }
@@ -133,7 +133,7 @@ class PentestToolsProxyService {
   // WordPress Scanner
   async startWordPressScan(target: string, params: any = {}): Promise<{ scan_id: number; target_id: number }> {
     return this.startScan({
-      tool_id: ProxyPentestToolId.WORDPRESS_SCANNER,
+      tool_id: ProxySecurityToolId.WORDPRESS_SCANNER,
       target_name: target,
       tool_params: params,
     });
@@ -142,7 +142,7 @@ class PentestToolsProxyService {
   // Website Scanner
   async startWebsiteScan(target: string, params: any = {}): Promise<{ scan_id: number; target_id: number }> {
     return this.startScan({
-      tool_id: ProxyPentestToolId.WEBSITE_SCANNER,
+      tool_id: ProxySecurityToolId.WEBSITE_SCANNER,
       target_name: target,
       tool_params: params,
     });
@@ -183,5 +183,5 @@ class PentestToolsProxyService {
   }
 }
 
-export const pentestToolsProxyService = new PentestToolsProxyService();
-export default pentestToolsProxyService;
+export const securityScannerProxyService = new SecurityScannerProxyService();
+export default securityScannerProxyService;

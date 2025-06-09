@@ -44,7 +44,7 @@ Zie [docs/SERVICE_CATALOG.md](docs/SERVICE_CATALOG.md) voor details.
 ## 🏗️ Architecture
 
 ```
-Frontend (React) → Backend API → Pentest-tools.com
+Frontend (React) → Backend API → Security Scanner API
                         ↓
                   PostgreSQL + Redis
 ```

@@ -34,7 +34,7 @@ const TOOLS = {
   'Joomla Scanner': 290,
 };
 
-const DirectPentestTools: React.FC = () => {
+const DirectSecurityScanner: React.FC = () => {
   const [target, setTarget] = useState('https://www.cobytes.com');
   const [selectedTool, setSelectedTool] = useState<string>('WordPress Scanner');
   const [loading, setLoading] = useState(false);
@@ -50,7 +50,7 @@ const DirectPentestTools: React.FC = () => {
     console.log(`[${timestamp}] ${message}`);
   };
 
-  // Direct CORS request to PentestTools API
+  // Direct CORS request to Security Scanner API
   const makeDirectRequest = async (endpoint: string, options: RequestInit = {}) => {
     const url = `${API_URL}${endpoint}`;
     addLog(`Making CORS request to: ${url}`);
@@ -212,11 +212,11 @@ const DirectPentestTools: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Direct PentestTools API v2 - CORS Test
+        Direct Security Scanner API v2 - CORS Test
       </Typography>
       
       <Alert severity="info" sx={{ mb: 3 }}>
-        This page makes direct CORS requests to the PentestTools API v2 without any proxy or backend.
+        This page makes direct CORS requests to the Security Scanner API v2 without any proxy or backend.
         Check the browser console (F12) for detailed logs and any CORS errors.
       </Alert>
 
@@ -361,4 +361,4 @@ const DirectPentestTools: React.FC = () => {
   );
 };
 
-export default DirectPentestTools;
+export default DirectSecurityScanner;

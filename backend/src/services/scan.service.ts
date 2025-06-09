@@ -1,6 +1,6 @@
 import { Scan, ScanStatus, ScanType } from '../models/scan.model';
 import { ScanResult, ResultSeverity } from '../models/scanResult.model';
-import pentestToolsService, { PentestToolId, ScanType as PTScanType } from './pentesttools.service';
+import securityScannerService, { SecurityToolId, ScanType as PTScanType } from './security-scanner.service';
 import mockScannerService from './mock-scanner.service';
 import orderService from './order.service';
 import { logger } from '../utils/logger';
@@ -221,7 +221,7 @@ class ScanService {
         }
 
         // Poll for scan completion
-        const result = await pentestToolsService.waitForScanCompletion(
+        const result = await securityScannerService.waitForScanCompletion(
           ptScanResult.scan_id,
           5000 // Poll every 5 seconds
         );
@@ -263,7 +263,7 @@ class ScanService {
   private async startPentestToolsScan(scan: Scan) {
     switch (scan.type) {
       case ScanType.SUBDOMAIN:
-        return pentestToolsService.startSubdomainScan(scan.target, {
+        return securityScannerService.startSubdomainScan(scan.target, {
           scan_type: scan.parameters.scan_type || PTScanType.DEEP,
           web_details: scan.parameters.web_details !== false,
           whois: scan.parameters.whois || false,
@@ -271,7 +271,7 @@ class ScanService {
         });
 
       case ScanType.PORT_SCAN:
-        return pentestToolsService.startPortScan(scan.target, {
+        return securityScannerService.startPortScan(scan.target, {
           scan_type: scan.parameters.scan_type || PTScanType.DEEP,
           protocol: scan.parameters.protocol || 'tcp',
           ports: scan.parameters.ports,
@@ -281,7 +281,7 @@ class ScanService {
         });
 
       case ScanType.WEBSITE:
-        return pentestToolsService.startWebsiteScan(scan.target, {
+        return securityScannerService.startWebsiteScan(scan.target, {
           scan_type: scan.parameters.scan_type || PTScanType.DEEP,
           attack_active: scan.parameters.attack_active || ['xss', 'sqli', 'lfi'],
           crawl_depth: scan.parameters.crawl_depth,
@@ -290,23 +290,23 @@ class ScanService {
         });
 
       case ScanType.NETWORK:
-        return pentestToolsService.startNetworkScan(scan.target, {
+        return securityScannerService.startNetworkScan(scan.target, {
           preset: scan.parameters.preset || PTScanType.DEEP,
           scanning_engines: scan.parameters.scanning_engines || ['version_based', 'sniper', 'nuclei'],
           ports: scan.parameters.ports
         });
 
       case ScanType.API:
-        return pentestToolsService.startAPIScan(scan.target, {
+        return securityScannerService.startAPIScan(scan.target, {
           openapi_url: scan.parameters.openapi_url,
           scan_type: scan.parameters.scan_type || PTScanType.DEEP
         });
 
       case ScanType.SSL:
-        return pentestToolsService.startSSLScan(scan.target);
+        return securityScannerService.startSSLScan(scan.target);
 
       case ScanType.WAF:
-        return pentestToolsService.startWAFDetection(scan.target);
+        return securityScannerService.startWAFDetection(scan.target);
 
       // CMS Scanners
       case ScanType.WORDPRESS:
@@ -325,83 +325,83 @@ class ScanService {
           }
         }
         
-        return pentestToolsService.startWordPressScan(scan.target, wpParams);
+        return securityScannerService.startWordPressScan(scan.target, wpParams);
 
       case ScanType.DRUPAL:
-        return pentestToolsService.startDrupalScan(scan.target, {
+        return securityScannerService.startDrupalScan(scan.target, {
           scan_type: scan.parameters.scan_type || PTScanType.DEEP
         });
 
       case ScanType.JOOMLA:
-        return pentestToolsService.startJoomlaScan(scan.target, {
+        return securityScannerService.startJoomlaScan(scan.target, {
           scan_type: scan.parameters.scan_type || PTScanType.DEEP
         });
 
       // case ScanType.MAGENTO:
-      //   return pentestToolsService.startMagentoScan(scan.target, scan.parameters);
+      //   return securityScannerService.startMagentoScan(scan.target, scan.parameters);
 
       case ScanType.SHAREPOINT:
-        return pentestToolsService.startSharePointScan(scan.target, scan.parameters);
+        return securityScannerService.startSharePointScan(scan.target, scan.parameters);
 
       // DNS & Domain Tools
       case ScanType.DNS_LOOKUP:
-        return pentestToolsService.startDNSLookup(scan.target, scan.parameters);
+        return securityScannerService.startDNSLookup(scan.target, scan.parameters);
 
       case ScanType.DNS_ZONE_TRANSFER:
-        return pentestToolsService.startDNSZoneTransfer(scan.target, scan.parameters);
+        return securityScannerService.startDNSZoneTransfer(scan.target, scan.parameters);
 
       case ScanType.WHOIS_LOOKUP:
-        return pentestToolsService.startWhoisLookup(scan.target, scan.parameters);
+        return securityScannerService.startWhoisLookup(scan.target, scan.parameters);
 
       case ScanType.EMAIL_FINDER:
-        return pentestToolsService.startEmailFinder(scan.target, scan.parameters);
+        return securityScannerService.startEmailFinder(scan.target, scan.parameters);
 
       // Network Tools
       case ScanType.PING_HOST:
-        return pentestToolsService.startPingHost(scan.target, scan.parameters);
+        return securityScannerService.startPingHost(scan.target, scan.parameters);
 
       case ScanType.TRACEROUTE:
-        return pentestToolsService.startTraceroute(scan.target, scan.parameters);
+        return securityScannerService.startTraceroute(scan.target, scan.parameters);
 
       // Web Application Testing
       case ScanType.HTTP_HEADERS:
-        return pentestToolsService.startHTTPHeaders(scan.target, scan.parameters);
+        return securityScannerService.startHTTPHeaders(scan.target, scan.parameters);
 
       // case ScanType.WEBSITE_SCREENSHOT:
-      //   return pentestToolsService.startWebsiteScreenshot(scan.target, scan.parameters);
+      //   return securityScannerService.startWebsiteScreenshot(scan.target, scan.parameters);
 
       case ScanType.WEBSITE_RECON:
-        return pentestToolsService.startWebsiteRecon(scan.target, scan.parameters);
+        return securityScannerService.startWebsiteRecon(scan.target, scan.parameters);
 
       case ScanType.URL_FUZZER:
-        return pentestToolsService.startURLFuzzer(scan.target, scan.parameters);
+        return securityScannerService.startURLFuzzer(scan.target, scan.parameters);
 
       // Vulnerability Scanners
       // case ScanType.XSS:
-      //   return pentestToolsService.startXSSScan(scan.target, scan.parameters);
+      //   return securityScannerService.startXSSScan(scan.target, scan.parameters);
 
       // case ScanType.SQLI:
-      //   return pentestToolsService.startSQLiScan(scan.target, scan.parameters);
+      //   return securityScannerService.startSQLiScan(scan.target, scan.parameters);
 
       // case ScanType.CORS:
-      //   return pentestToolsService.startCORSScan(scan.target, scan.parameters);
+      //   return securityScannerService.startCORSScan(scan.target, scan.parameters);
 
       // Cloud & Advanced
       // case ScanType.S3_BUCKET:
-      //   return pentestToolsService.startS3BucketFinder(scan.target, scan.parameters);
+      //   return securityScannerService.startS3BucketFinder(scan.target, scan.parameters);
 
       // case ScanType.SUBDOMAIN_TAKEOVER:
-      //   return pentestToolsService.startSubdomainTakeover(scan.target, scan.parameters);
+      //   return securityScannerService.startSubdomainTakeover(scan.target, scan.parameters);
 
       // case ScanType.GRAPHQL:
-      //   return pentestToolsService.startGraphQLScan(scan.target, scan.parameters);
+      //   return securityScannerService.startGraphQLScan(scan.target, scan.parameters);
 
       // OSINT Tools
       // case ScanType.GOOGLE_HACKING:
-      //   return pentestToolsService.startGoogleHacking(scan.target, scan.parameters);
+      //   return securityScannerService.startGoogleHacking(scan.target, scan.parameters);
 
       // case ScanType.BREACH_CHECK:
-      //   return pentestToolsService.startBreachCheck(scan.target, scan.parameters);
+      //   return securityScannerService.startBreachCheck(scan.target, scan.parameters);
 
       default:
         throw new Error(`Unsupported scan type: ${scan.type}`);
@@ -565,7 +565,7 @@ class ScanService {
     if (!scan) throw new Error('Scan not found');
 
     if (scan.pentest_tools_scan_id) {
-      await pentestToolsService.stopScan(scan.pentest_tools_scan_id);
+      await securityScannerService.stopScan(scan.pentest_tools_scan_id);
     }
 
     scan.status = ScanStatus.CANCELLED;
@@ -578,7 +578,7 @@ class ScanService {
     if (!scan) throw new Error('Scan not found');
 
     if (scan.pentest_tools_scan_id) {
-      await pentestToolsService.deleteScan(scan.pentest_tools_scan_id);
+      await securityScannerService.deleteScan(scan.pentest_tools_scan_id);
     }
 
     await this.scanResultRepository!.delete({ scan: { id: scanId } });

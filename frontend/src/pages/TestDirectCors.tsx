@@ -12,7 +12,7 @@ import {
   CardContent,
   Divider,
 } from '@mui/material';
-import pentestToolsDirectService, { ToolId } from '../services/pentesttools-direct.service';
+import securityScannerDirectService, { ToolId } from '../services/security-scanner-direct.service';
 
 const TestDirectCors: React.FC = () => {
   const [target, setTarget] = useState('https://www.cobytes.com');
@@ -40,7 +40,7 @@ const TestDirectCors: React.FC = () => {
       addLog(`Target: ${target}`);
       
       // Start WordPress scan
-      const result = await pentestToolsDirectService.startWordPressScan(target);
+      const result = await securityScannerDirectService.startWordPressScan(target);
       
       setScanId(result.scan_id);
       setSuccess(`Scan started successfully! Scan ID: ${result.scan_id}`);
@@ -49,7 +49,7 @@ const TestDirectCors: React.FC = () => {
       // Poll for status
       addLog('Polling scan status...');
       
-      await pentestToolsDirectService.waitForScanCompletion(
+      await securityScannerDirectService.waitForScanCompletion(
         result.scan_id,
         (status) => {
           setScanStatus(status);
@@ -79,7 +79,7 @@ const TestDirectCors: React.FC = () => {
     
     try {
       addLog(`Checking status for scan ${scanId}...`);
-      const status = await pentestToolsDirectService.getScanStatus(scanId);
+      const status = await securityScannerDirectService.getScanStatus(scanId);
       setScanStatus(status);
       addLog(`Current status: ${status.status}`);
     } catch (err: any) {

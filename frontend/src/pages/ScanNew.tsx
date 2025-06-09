@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import scanService, { ScanType } from '../services/scan.service';
-import { ProxyPentestToolId } from '../services/pentesttools-proxy.service';
+import { ProxySecurityToolId } from '../services/security-scanner-proxy.service';
 
 const ScanNew: React.FC = () => {
   const navigate = useNavigate();
@@ -22,77 +22,77 @@ const ScanNew: React.FC = () => {
       // Get regular scan types from backend
       const backendTypes = await scanService.getScanTypes();
       
-      // Add PentestTools scanner types
+      // Add Security scanner types
       const pentestToolsTypes: ScanType[] = [
         {
           id: 'pentest_wordpress',
-          name: 'WordPress Scanner (PentestTools)',
+          name: 'WordPress Scanner',
           description: 'Comprehensive WordPress vulnerability scanner',
           parameters: {}
         },
         {
           id: 'pentest_subdomain',
-          name: 'Subdomain Finder (PentestTools)',
+          name: 'Subdomain Finder',
           description: 'Discover subdomains for a target domain',
           parameters: {}
         },
         {
           id: 'pentest_website',
-          name: 'Website Scanner (PentestTools)',
+          name: 'Website Scanner',
           description: 'Scan websites for vulnerabilities',
           parameters: {}
         },
         {
           id: 'pentest_ssl',
-          name: 'SSL/TLS Scanner (PentestTools)',
+          name: 'SSL/TLS Scanner',
           description: 'Analyze SSL/TLS configuration',
           parameters: {}
         },
         {
           id: 'pentest_tcp_port',
-          name: 'TCP Port Scanner (PentestTools)',
+          name: 'TCP Port Scanner',
           description: 'Scan TCP ports on target systems',
           parameters: {}
         },
         {
           id: 'pentest_waf',
-          name: 'WAF Detector (PentestTools)',
+          name: 'WAF Detector',
           description: 'Detect Web Application Firewalls',
           parameters: {}
         },
         {
           id: 'pentest_api',
-          name: 'API Scanner (PentestTools)',
+          name: 'API Scanner',
           description: 'Test API endpoints for security issues',
           parameters: {}
         },
         {
           id: 'pentest_drupal',
-          name: 'Drupal Scanner (PentestTools)',
+          name: 'Drupal Scanner',
           description: 'Scan Drupal sites for vulnerabilities',
           parameters: {}
         },
         {
           id: 'pentest_joomla',
-          name: 'Joomla Scanner (PentestTools)',
+          name: 'Joomla Scanner',
           description: 'Scan Joomla sites for vulnerabilities',
           parameters: {}
         },
         {
           id: 'pentest_url_fuzzer',
-          name: 'URL Fuzzer (PentestTools)',
+          name: 'URL Fuzzer',
           description: 'Discover hidden files and directories',
           parameters: {}
         },
         {
           id: 'pentest_recon',
-          name: 'Website Recon (PentestTools)',
+          name: 'Website Recon',
           description: 'Comprehensive website reconnaissance',
           parameters: {}
         },
         {
           id: 'pentest_network',
-          name: 'Network Scanner (PentestTools)',
+          name: 'Network Scanner',
           description: 'Comprehensive network vulnerability scanning',
           parameters: {}
         }
@@ -150,33 +150,33 @@ const ScanNew: React.FC = () => {
       if (selectedScanType.startsWith('pentest_')) {
         // Extract tool ID from scan type
         const toolIdMap: Record<string, number> = {
-          pentest_subdomain: ProxyPentestToolId.SUBDOMAIN_FINDER,
-          pentest_tcp_port: ProxyPentestToolId.TCP_PORT_SCANNER,
-          pentest_udp_port: ProxyPentestToolId.UDP_PORT_SCANNER,
-          pentest_website: ProxyPentestToolId.WEBSITE_SCANNER,
-          pentest_wordpress: ProxyPentestToolId.WORDPRESS_SCANNER,
-          pentest_drupal: ProxyPentestToolId.DRUPAL_SCANNER,
-          pentest_joomla: ProxyPentestToolId.JOOMLA_SCANNER,
-          pentest_sharepoint: ProxyPentestToolId.SHARE_POINT_SCANNER,
-          pentest_ssl: ProxyPentestToolId.SSL_SCANNER,
-          pentest_waf: ProxyPentestToolId.WAF_DETECTOR,
-          pentest_api: ProxyPentestToolId.API_SCANNER,
-          pentest_url_fuzzer: ProxyPentestToolId.URL_FUZZER,
-          pentest_vhost: ProxyPentestToolId.FIND_VHOSTS,
-          pentest_recon: ProxyPentestToolId.WEBSITE_RECON,
-          pentest_network: ProxyPentestToolId.NETWORK_SCANNER,
-          pentest_domain: ProxyPentestToolId.DOMAIN_FINDER,
-          pentest_password: ProxyPentestToolId.PASSWORD_AUDITOR,
-          pentest_sniper: ProxyPentestToolId.SNIPER,
-          pentest_cloud: ProxyPentestToolId.CLOUD_SCANNER,
-          pentest_kubernetes: ProxyPentestToolId.KUBERNETES_SCANNER
+          pentest_subdomain: ProxySecurityToolId.SUBDOMAIN_FINDER,
+          pentest_tcp_port: ProxySecurityToolId.TCP_PORT_SCANNER,
+          pentest_udp_port: ProxySecurityToolId.UDP_PORT_SCANNER,
+          pentest_website: ProxySecurityToolId.WEBSITE_SCANNER,
+          pentest_wordpress: ProxySecurityToolId.WORDPRESS_SCANNER,
+          pentest_drupal: ProxySecurityToolId.DRUPAL_SCANNER,
+          pentest_joomla: ProxySecurityToolId.JOOMLA_SCANNER,
+          pentest_sharepoint: ProxySecurityToolId.SHARE_POINT_SCANNER,
+          pentest_ssl: ProxySecurityToolId.SSL_SCANNER,
+          pentest_waf: ProxySecurityToolId.WAF_DETECTOR,
+          pentest_api: ProxySecurityToolId.API_SCANNER,
+          pentest_url_fuzzer: ProxySecurityToolId.URL_FUZZER,
+          pentest_vhost: ProxySecurityToolId.FIND_VHOSTS,
+          pentest_recon: ProxySecurityToolId.WEBSITE_RECON,
+          pentest_network: ProxySecurityToolId.NETWORK_SCANNER,
+          pentest_domain: ProxySecurityToolId.DOMAIN_FINDER,
+          pentest_password: ProxySecurityToolId.PASSWORD_AUDITOR,
+          pentest_sniper: ProxySecurityToolId.SNIPER,
+          pentest_cloud: ProxySecurityToolId.CLOUD_SCANNER,
+          pentest_kubernetes: ProxySecurityToolId.KUBERNETES_SCANNER
         };
         
         const toolId = toolIdMap[selectedScanType];
         if (toolId) {
-          scan = await scanService.createPentestToolsScan(toolId, target, parameters);
+          scan = await scanService.createSecurityScan(toolId, target, parameters);
         } else {
-          throw new Error('Unknown PentestTools scanner type');
+          throw new Error('Unknown security scanner type');
         }
       } else {
         // Use regular scan service

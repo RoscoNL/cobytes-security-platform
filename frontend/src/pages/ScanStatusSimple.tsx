@@ -28,7 +28,7 @@ import {
 } from '@mui/icons-material';
 
 const PROXY_URL = 'https://thingproxy.freeboard.io/fetch/';
-const PENTEST_API = 'https://app.pentest-tools.com/api/v2';
+const SECURITY_API = 'https://app.pentest-tools.com/api/v2';
 const API_KEY = '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
 
 const ScanStatusSimple: React.FC = () => {
@@ -41,7 +41,7 @@ const ScanStatusSimple: React.FC = () => {
   const [isPolling, setIsPolling] = useState(true);
 
   const makeProxyRequest = async (method: string, endpoint: string) => {
-    const url = `${PROXY_URL}${PENTEST_API}${endpoint}`;
+    const url = `${PROXY_URL}${SECURITY_API}${endpoint}`;
     
     const response = await fetch(url, {
       method,
@@ -164,14 +164,18 @@ const ScanStatusSimple: React.FC = () => {
           >
             Refresh
           </Button>
-          <Button
-            startIcon={<OpenInNewIcon />}
-            href={`https://app.pentest-tools.com/scans/${scanId}`}
-            target="_blank"
-            variant="outlined"
-          >
-            View on PentestTools
-          </Button>
+          {scan && scan.status === 'finished' && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                // Generate PDF report
+                window.print(); // For now, use browser print. Later implement proper PDF generation
+              }}
+            >
+              Download Report
+            </Button>
+          )}
         </Box>
       </Box>
 

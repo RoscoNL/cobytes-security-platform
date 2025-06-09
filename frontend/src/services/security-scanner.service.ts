@@ -1,4 +1,4 @@
-// PentestTools API client using the working CORS proxy
+// Security Scanner API client using CORS proxy
 const API_KEY = '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
 const PROXY_URL = 'https://thingproxy.freeboard.io/fetch/';
 const API_URL = `${PROXY_URL}https://app.pentest-tools.com/api/v2`;
@@ -9,14 +9,14 @@ const headers = {
   'Accept': 'application/json',
 };
 
-export interface PentestToolsTarget {
+export interface ScannerTarget {
   id: number;
   name: string;
   description?: string;
   workspace_id?: number;
 }
 
-export interface PentestToolsScan {
+export interface SecurityScan {
   id: number;
   tool_id: number;
   target_id: number;
@@ -33,8 +33,8 @@ export interface ScanOptions {
   tool_params: Record<string, any>;
 }
 
-// Tool IDs from PentestTools API
-export const PentestToolId = {
+// Tool IDs for security scanners
+export const SecurityToolId = {
   SUBDOMAIN_FINDER: 20,
   TCP_PORT_SCANNER: 70,
   UDP_PORT_SCANNER: 80,
@@ -57,9 +57,9 @@ export const PentestToolId = {
   KUBERNETES_SCANNER: 540,
 };
 
-class PentestToolsService {
+class SecurityScannerService {
   // Target Management
-  async createTarget(name: string, description?: string): Promise<PentestToolsTarget> {
+  async createTarget(name: string, description?: string): Promise<ScannerTarget> {
     const response = await fetch(`${API_URL}/targets`, {
       method: 'POST',
       headers,
@@ -74,7 +74,7 @@ class PentestToolsService {
     return result.data;
   }
 
-  async getTargets(): Promise<PentestToolsTarget[]> {
+  async getTargets(): Promise<ScannerTarget[]> {
     const response = await fetch(`${API_URL}/targets`, {
       method: 'GET',
       headers,
@@ -88,7 +88,7 @@ class PentestToolsService {
     return result.data || [];
   }
 
-  async getTarget(targetId: number): Promise<PentestToolsTarget> {
+  async getTarget(targetId: number): Promise<ScannerTarget> {
     const response = await fetch(`${API_URL}/targets/${targetId}`, {
       method: 'GET',
       headers,
@@ -122,7 +122,7 @@ class PentestToolsService {
     };
   }
 
-  async getScanStatus(scanId: number): Promise<PentestToolsScan> {
+  async getScanStatus(scanId: number): Promise<SecurityScan> {
     const response = await fetch(`${API_URL}/scans/${scanId}`, {
       method: 'GET',
       headers,
@@ -175,7 +175,7 @@ class PentestToolsService {
   // WordPress Scanner
   async startWordPressScan(target: string, params: any = {}): Promise<{ scan_id: number; target_id: number }> {
     return this.startScan({
-      tool_id: PentestToolId.WORDPRESS_SCANNER,
+      tool_id: SecurityToolId.WORDPRESS_SCANNER,
       target_name: target,
       tool_params: params,
     });
@@ -216,5 +216,5 @@ class PentestToolsService {
   }
 }
 
-export const pentestToolsService = new PentestToolsService();
-export default pentestToolsService;
+export const securityScannerService = new SecurityScannerService();
+export default securityScannerService;

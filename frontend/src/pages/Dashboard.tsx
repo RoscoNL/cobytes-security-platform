@@ -37,7 +37,7 @@ import {
 import { SecurityStatusIndicator, ScanProgressBar } from '../components/cobytes';
 import { cobytesColors } from '../theme/cobytes-theme';
 import scanService, { Scan } from '../services/scan.service';
-import PentestToolsScans from '../components/PentestToolsScans';
+// import PentestToolsScans from '../components/PentestToolsScans';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -253,12 +253,12 @@ const Dashboard: React.FC = () => {
       </Grid>
 
       {/* PentestTools Integration */}
-      <Box sx={{ mb: 4 }}>
+      {/* <Box sx={{ mb: 4 }}>
         <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: cobytesColors.navy }}>
           Live Security Scans
         </Typography>
         <PentestToolsScans />
-      </Box>
+      </Box> */}
 
       {/* Recent Backend Scans */}
       <Grid container spacing={3}>

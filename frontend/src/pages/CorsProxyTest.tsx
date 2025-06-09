@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Typography, Box, Button, Alert, CircularProgress, Card, CardContent } from '@mui/material';
-import { pentestToolsProxyService } from '../services/pentesttools-proxy.service';
+import { securityScannerProxyService } from '../services/security-scanner-proxy.service';
 
 const CorsProxyTest: React.FC = () => {
   const [testing, setTesting] = useState(false);
@@ -14,7 +14,7 @@ const CorsProxyTest: React.FC = () => {
     
     try {
       console.log('Testing PentestTools API via corsproxy.io...');
-      const targets = await pentestToolsProxyService.getTargets();
+      const targets = await securityScannerProxyService.getTargets();
       setResult({ success: true, data: targets });
       console.log('API test successful:', targets);
     } catch (err: any) {
@@ -33,7 +33,7 @@ const CorsProxyTest: React.FC = () => {
     try {
       console.log('Testing WordPress scan via corsproxy.io...');
       // Just test creating a target first
-      const targetResult = await pentestToolsProxyService.createTarget('https://www.cobytes.com', 'Test target for WordPress scan');
+      const targetResult = await securityScannerProxyService.createTarget('https://www.cobytes.com', 'Test target for WordPress scan');
       setResult({ success: true, message: 'Target created successfully', data: targetResult });
       console.log('WordPress target test successful:', targetResult);
     } catch (err: any) {

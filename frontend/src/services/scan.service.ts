@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { io, Socket } from 'socket.io-client';
-import { pentestToolsProxyService, ProxyPentestToolId } from './pentesttools-proxy.service';
-import pentestToolsDirectService from './pentesttools-direct.service';
+import { securityScannerProxyService, ProxySecurityToolId } from './security-scanner-proxy.service';
+import securityScannerDirectService from './security-scanner-direct.service';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
@@ -30,7 +30,7 @@ export interface Scan {
   completed_at?: string;
   error_message?: string;
   results?: ScanResult[];
-  pentestToolsScanId?: number;
+  securityScanId?: number;
 }
 
 export interface ScanResult {
@@ -186,22 +186,22 @@ class ScanService {
     }
   }
 
-  // PentestTools integration
-  async createPentestToolsScan(toolId: number, target: string, params: any = {}): Promise<any> {
+  // Security Scanner integration
+  async createSecurityScan(toolId: number, target: string, params: any = {}): Promise<any> {
     try {
       // Use direct CORS API
-      console.log('Creating PentestTools scan via direct CORS...');
+      console.log('Creating security scan via direct CORS...');
       
       // Create or get target
       let targetId;
       try {
-        const targets = await pentestToolsDirectService.getTargets();
+        const targets = await securityScannerDirectService.getTargets();
         const existingTarget = targets.find(t => t.name === target);
         
         if (existingTarget) {
           targetId = existingTarget.id;
         } else {
-          const newTarget = await pentestToolsDirectService.createTarget(target);
+          const newTarget = await securityScannerDirectService.createTarget(target);
           targetId = newTarget.id;
         }
       } catch (err) {
@@ -216,7 +216,7 @@ class ScanService {
         tool_params: params
       };
 
-      const { scan_id } = await pentestToolsDirectService.startScan(scanOptions);
+      const { scan_id } = await securityScannerDirectService.startScan(scanOptions);
       
       // Return scan info for tracking
       return {
@@ -226,15 +226,15 @@ class ScanService {
         status: 'running',
         progress: 0,
         parameters: params,
-        pentestToolsScanId: scan_id
+        securityScanId: scan_id
       };
     } catch (error: any) {
-      console.error('Failed to create PentestTools scan:', error);
+      console.error('Failed to create security scan:', error);
       
       // Fallback to proxy if direct CORS fails
       if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
         console.log('Direct CORS failed, falling back to proxy...');
-        return this.createPentestToolsScanViaProxy(toolId, target, params);
+        return this.createSecurityScanViaProxy(toolId, target, params);
       }
       
       throw error;
@@ -242,18 +242,18 @@ class ScanService {
   }
 
   // Fallback method using proxy
-  private async createPentestToolsScanViaProxy(toolId: number, target: string, params: any = {}): Promise<any> {
+  private async createSecurityScanViaProxy(toolId: number, target: string, params: any = {}): Promise<any> {
     try {
       // Create or get target
       let targetId;
       try {
-        const targets = await pentestToolsProxyService.getTargets();
+        const targets = await securityScannerProxyService.getTargets();
         const existingTarget = targets.find(t => t.name === target);
         
         if (existingTarget) {
           targetId = existingTarget.id;
         } else {
-          const newTarget = await pentestToolsProxyService.createTarget(target);
+          const newTarget = await securityScannerProxyService.createTarget(target);
           targetId = newTarget.id;
         }
       } catch (err) {
@@ -268,7 +268,7 @@ class ScanService {
         tool_params: params
       };
 
-      const { scan_id } = await pentestToolsProxyService.startScan(scanOptions);
+      const { scan_id } = await securityScannerProxyService.startScan(scanOptions);
       
       // Return scan info for tracking
       return {
@@ -278,17 +278,17 @@ class ScanService {
         status: 'running',
         progress: 0,
         parameters: params,
-        pentestToolsScanId: scan_id
+        securityScanId: scan_id
       };
     } catch (error: any) {
-      console.error('Failed to create PentestTools scan via proxy:', error);
+      console.error('Failed to create security scan via proxy:', error);
       throw error;
     }
   }
 
-  // Poll PentestTools scan status
-  async pollPentestToolsScan(scanId: number, onProgress?: (progress: number) => void): Promise<any> {
-    return pentestToolsProxyService.waitForScanCompletion(scanId, onProgress);
+  // Poll Security scan status
+  async pollSecurityScan(scanId: number, onProgress?: (progress: number) => void): Promise<any> {
+    return securityScannerProxyService.waitForScanCompletion(scanId, onProgress);
   }
 }
 

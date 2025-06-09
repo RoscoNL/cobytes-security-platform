@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { asyncHandler } from '@middleware/asyncHandler';
-import pentestToolsService from '@services/pentesttools.service';
+import securityScannerService from '@services/security-scanner.service';
 import { logger } from '@utils/logger';
 
 const router = Router();
@@ -17,8 +17,8 @@ router.get('/health', (req: Request, res: Response) => {
 
 // Check API status
 router.get('/api-status', asyncHandler(async (req: Request, res: Response) => {
-  const apiKey = process.env.PENTEST_TOOLS_API_KEY;
-  const apiUrl = process.env.PENTEST_TOOLS_API_URL || 'https://app.pentest-tools.com/api/v2';
+  const apiKey = process.env.SECURITY_API_KEY;
+  const apiUrl = process.env.SECURITY_API_URL || 'https://app.pentest-tools.com/api/v2';
   
   res.json({
     apiConfigured: !!apiKey && apiKey.length > 10,
@@ -32,7 +32,7 @@ router.get('/api-status', asyncHandler(async (req: Request, res: Response) => {
 router.post('/test-api', asyncHandler(async (req: Request, res: Response) => {
   try {
     // Try to get targets (simple API call to test authentication)
-    const result = await pentestToolsService.getTargets();
+    const result = await securityScannerService.getTargets();
     res.json({
       success: true,
       message: 'API connection successful',

@@ -1,8 +1,8 @@
 {
-  "timestamp": "2025-06-07T21:36:43.343Z",
+  "timestamp": "2025-06-08T16:11:42.105Z",
   "environment": "production",
   "tests": {
-    "apiHealth": "FAILED",
+    "apiHealth": "PASSED",
     "authentication": "FAILED",
     "landingPage": "PASSED"
   },
@@ -11,22 +11,18 @@
   "features": {},
   "errors": [
     {
-      "test": "apiHealth",
-      "error": "Request failed with status code 404"
-    },
-    {
       "test": "authentication",
       "error": "Request failed with status code 404"
     },
     {
       "test": "general",
-      "error": "No element found for selector: input[name=\"email\"], input[type=\"email\"]"
+      "error": "Navigation timeout of 30000 ms exceeded"
     }
   ],
   "summary": {
     "totalTests": 3,
-    "passed": 1,
-    "failed": 2,
-    "errors": 3
+    "passed": 2,
+    "failed": 1,
+    "errors": 2
   }
 }

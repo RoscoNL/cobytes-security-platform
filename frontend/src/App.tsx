@@ -33,7 +33,7 @@ import OrderSuccess from './pages/OrderSuccess';
 import OrderCancelled from './pages/OrderCancelled';
 import Orders from './pages/Orders';
 import TestDirectCors from './pages/TestDirectCors';
-import DirectPentestTools from './pages/DirectPentestTools';
+import DirectSecurityScanner from './pages/DirectSecurityScanner';
 import ScanCreate from './pages/ScanCreate';
 import ScanStatusSimple from './pages/ScanStatusSimple';
 import './App.css';
@@ -77,7 +77,7 @@ function App() {
             <Route path="/dashboard/all-scanners" element={<AllScannersNew />} />
             <Route path="/dashboard/integration" element={<IntegrationStatus />} />
             <Route path="/dashboard/test-direct-cors" element={<TestDirectCors />} />
-            <Route path="/dashboard/direct-pentest" element={<DirectPentestTools />} />
+            <Route path="/dashboard/direct-pentest" element={<DirectSecurityScanner />} />
           </Route>
         </Routes>
       </Router>

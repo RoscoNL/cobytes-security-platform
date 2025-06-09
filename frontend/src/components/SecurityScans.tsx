@@ -32,7 +32,7 @@ interface StoredScan {
   createdAt: string;
 }
 
-const PentestToolsScans: React.FC = () => {
+const SecurityScans: React.FC = () => {
   const navigate = useNavigate();
   const [scans, setScans] = useState<StoredScan[]>([]);
 
@@ -42,7 +42,7 @@ const PentestToolsScans: React.FC = () => {
 
   const loadScans = () => {
     // Load scans from localStorage
-    const storedScans = localStorage.getItem('pentesttools_scans');
+    const storedScans = localStorage.getItem('security_scans');
     if (storedScans) {
       const parsedScans = JSON.parse(storedScans);
       // Sort by creation date, newest first
@@ -187,4 +187,4 @@ const PentestToolsScans: React.FC = () => {
   );
 };
 
-export default PentestToolsScans;
+export default SecurityScans;

@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import { logger } from '../utils/logger';
 
-// Tool IDs from PentestTools API
-export enum PentestToolId {
+// Tool IDs from Security Scanner API
+export enum SecurityToolId {
   SUBDOMAIN_FINDER = 20,
   WHOIS_LOOKUP = 40,
   EMAIL_FINDER = 25,
@@ -46,7 +46,7 @@ export enum ScanStatus {
 }
 
 export interface ScanOptions {
-  tool_id: PentestToolId;
+  tool_id: SecurityToolId;
   target_name?: string;
   target_id?: number;
   tool_params: Record<string, any>;
@@ -99,18 +99,18 @@ export interface APIScannerParams {
   scan_type?: ScanType;
 }
 
-class PentestToolsService {
+class SecurityScannerService {
   private client: AxiosInstance;
   private apiKey: string;
 
   constructor() {
-    this.apiKey = process.env.PENTEST_TOOLS_API_KEY || '';
+    this.apiKey = process.env.SECURITY_API_KEY || '';
     if (!this.apiKey) {
-      logger.warn('PentestTools API key not configured');
+      logger.warn('Security Scanner API key not configured');
     }
 
     this.client = axios.create({
-      baseURL: process.env.PENTEST_TOOLS_API_URL || 'https://app.pentest-tools.com/api/v2',
+      baseURL: process.env.SECURITY_API_URL || 'https://app.pentest-tools.com/api/v2',
       headers: {
         'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json'
@@ -121,7 +121,7 @@ class PentestToolsService {
     // Add request/response interceptors for logging
     this.client.interceptors.request.use(
       (config) => {
-        logger.debug('PentestTools API request', { 
+        logger.debug('Security Scanner API request', { 
           method: config.method, 
           url: config.url,
           params: config.params 
@@ -129,21 +129,21 @@ class PentestToolsService {
         return config;
       },
       (error) => {
-        logger.error('PentestTools API request error', error);
+        logger.error('Security Scanner API request error', error);
         return Promise.reject(error);
       }
     );
 
     this.client.interceptors.response.use(
       (response) => {
-        logger.debug('PentestTools API response', { 
+        logger.debug('Security Scanner API response', { 
           status: response.status,
           url: response.config.url 
         });
         return response;
       },
       (error) => {
-        logger.error('PentestTools API response error', {
+        logger.error('Security Scanner API response error', {
           status: error.response?.status,
           message: error.response?.data?.message || error.message,
           url: error.config?.url
@@ -247,7 +247,7 @@ class PentestToolsService {
   // Specific Scanner Methods
   async startSubdomainScan(target: string, params: SubdomainFinderParams) {
     return this.startScan({
-      tool_id: PentestToolId.SUBDOMAIN_FINDER,
+      tool_id: SecurityToolId.SUBDOMAIN_FINDER,
       target_name: target,
       tool_params: params
     });
@@ -255,8 +255,8 @@ class PentestToolsService {
 
   async startPortScan(target: string, params: PortScannerParams) {
     const tool_id = params.protocol === 'udp' 
-      ? PentestToolId.UDP_PORT_SCANNER 
-      : PentestToolId.TCP_PORT_SCANNER;
+      ? SecurityToolId.UDP_PORT_SCANNER 
+      : SecurityToolId.TCP_PORT_SCANNER;
 
     return this.startScan({
       tool_id,
@@ -267,7 +267,7 @@ class PentestToolsService {
 
   async startWebsiteScan(target: string, params: WebsiteScannerParams, auth?: any) {
     return this.startScan({
-      tool_id: PentestToolId.WEBSITE_SCANNER,
+      tool_id: SecurityToolId.WEBSITE_SCANNER,
       target_name: target,
       tool_params: params,
       authentication: auth
@@ -276,7 +276,7 @@ class PentestToolsService {
 
   async startNetworkScan(target: string, params: NetworkScannerParams) {
     return this.startScan({
-      tool_id: PentestToolId.NETWORK_SCANNER,
+      tool_id: SecurityToolId.NETWORK_SCANNER,
       target_name: target,
       tool_params: params
     });
@@ -284,7 +284,7 @@ class PentestToolsService {
 
   async startAPIScan(target: string, params: APIScannerParams, auth?: any) {
     return this.startScan({
-      tool_id: PentestToolId.API_SCANNER,
+      tool_id: SecurityToolId.API_SCANNER,
       target_name: target,
       tool_params: params,
       authentication: auth
@@ -293,7 +293,7 @@ class PentestToolsService {
 
   async startSSLScan(target: string) {
     return this.startScan({
-      tool_id: PentestToolId.SSL_SCANNER,
+      tool_id: SecurityToolId.SSL_SCANNER,
       target_name: target,
       tool_params: {}
     });
@@ -301,7 +301,7 @@ class PentestToolsService {
 
   async startWAFDetection(target: string) {
     return this.startScan({
-      tool_id: PentestToolId.WAF_DETECTOR,
+      tool_id: SecurityToolId.WAF_DETECTOR,
       target_name: target,
       tool_params: {}
     });
@@ -310,7 +310,7 @@ class PentestToolsService {
   // CMS Scanners
   async startWordPressScan(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.WORDPRESS_SCANNER,
+      tool_id: SecurityToolId.WORDPRESS_SCANNER,
       target_name: target,
       tool_params: params
     });
@@ -318,7 +318,7 @@ class PentestToolsService {
 
   async startDrupalScan(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.DRUPAL_SCANNER,
+      tool_id: SecurityToolId.DRUPAL_SCANNER,
       target_name: target,
       tool_params: params
     });
@@ -326,7 +326,7 @@ class PentestToolsService {
 
   async startJoomlaScan(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.JOOMLA_SCANNER,
+      tool_id: SecurityToolId.JOOMLA_SCANNER,
       target_name: target,
       tool_params: params
     });
@@ -334,7 +334,7 @@ class PentestToolsService {
 
   async startSharePointScan(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.SHARE_POINT_SCANNER,
+      tool_id: SecurityToolId.SHARE_POINT_SCANNER,
       target_name: target,
       tool_params: params
     });
@@ -343,7 +343,7 @@ class PentestToolsService {
   // DNS & Domain Tools
   async startDNSLookup(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.DNS_LOOKUP,
+      tool_id: SecurityToolId.DNS_LOOKUP,
       target_name: target,
       tool_params: params
     });
@@ -351,7 +351,7 @@ class PentestToolsService {
 
   async startDNSZoneTransfer(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.DNS_ZONE_TRANSFER,
+      tool_id: SecurityToolId.DNS_ZONE_TRANSFER,
       target_name: target,
       tool_params: params
     });
@@ -359,7 +359,7 @@ class PentestToolsService {
 
   async startWhoisLookup(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.WHOIS_LOOKUP,
+      tool_id: SecurityToolId.WHOIS_LOOKUP,
       target_name: target,
       tool_params: params
     });
@@ -367,7 +367,7 @@ class PentestToolsService {
 
   async startEmailFinder(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.EMAIL_FINDER,
+      tool_id: SecurityToolId.EMAIL_FINDER,
       target_name: target,
       tool_params: params
     });
@@ -376,7 +376,7 @@ class PentestToolsService {
   // Network Tools
   async startPingHost(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.PING_HOST,
+      tool_id: SecurityToolId.PING_HOST,
       target_name: target,
       tool_params: params
     });
@@ -384,7 +384,7 @@ class PentestToolsService {
 
   async startTraceroute(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.TRACEROUTE,
+      tool_id: SecurityToolId.TRACEROUTE,
       target_name: target,
       tool_params: params
     });
@@ -393,7 +393,7 @@ class PentestToolsService {
   // Web Application Testing
   async startHTTPHeaders(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.HTTP_HEADERS,
+      tool_id: SecurityToolId.HTTP_HEADERS,
       target_name: target,
       tool_params: params
     });
@@ -401,7 +401,7 @@ class PentestToolsService {
 
   // async startWebsiteScreenshot(target: string, params: any = {}) {
   //   return this.startScan({
-  //     tool_id: PentestToolId.WEBSITE_SCREENSHOT,
+  //     tool_id: SecurityToolId.WEBSITE_SCREENSHOT,
   //     target_name: target,
   //     tool_params: params
   //   });
@@ -409,7 +409,7 @@ class PentestToolsService {
 
   async startWebsiteRecon(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.WEBSITE_RECON,
+      tool_id: SecurityToolId.WEBSITE_RECON,
       target_name: target,
       tool_params: params
     });
@@ -417,7 +417,7 @@ class PentestToolsService {
 
   async startURLFuzzer(target: string, params: any = {}) {
     return this.startScan({
-      tool_id: PentestToolId.URL_FUZZER,
+      tool_id: SecurityToolId.URL_FUZZER,
       target_name: target,
       tool_params: params
     });
@@ -426,7 +426,7 @@ class PentestToolsService {
   // Vulnerability Scanners
   // async startXSSScan(target: string, params: any = {}) {
   //   return this.startScan({
-  //     tool_id: PentestToolId.XSS_SCANNER,
+  //     tool_id: SecurityToolId.XSS_SCANNER,
   //     target_name: target,
   //     tool_params: params
   //   });
@@ -434,7 +434,7 @@ class PentestToolsService {
 
   // async startSQLiScan(target: string, params: any = {}) {
   //   return this.startScan({
-  //     tool_id: PentestToolId.SQLI_SCANNER,
+  //     tool_id: SecurityToolId.SQLI_SCANNER,
   //     target_name: target,
   //     tool_params: params
   //   });
@@ -442,7 +442,7 @@ class PentestToolsService {
 
   // async startCORSScan(target: string, params: any = {}) {
   //   return this.startScan({
-  //     tool_id: PentestToolId.CORS_SCANNER,
+  //     tool_id: SecurityToolId.CORS_SCANNER,
   //     target_name: target,
   //     tool_params: params
   //   });
@@ -451,7 +451,7 @@ class PentestToolsService {
   // Cloud & Advanced
   // async startS3BucketFinder(target: string, params: any = {}) {
   //   return this.startScan({
-  //     tool_id: PentestToolId.S3_BUCKET_FINDER,
+  //     tool_id: SecurityToolId.S3_BUCKET_FINDER,
   //     target_name: target,
   //     tool_params: params
   //   });
@@ -459,7 +459,7 @@ class PentestToolsService {
 
   // async startSubdomainTakeover(target: string, params: any = {}) {
   //   return this.startScan({
-  //     tool_id: PentestToolId.SUBDOMAIN_TAKEOVER,
+  //     tool_id: SecurityToolId.SUBDOMAIN_TAKEOVER,
   //     target_name: target,
   //     tool_params: params
   //   });
@@ -467,7 +467,7 @@ class PentestToolsService {
 
   // async startGraphQLScan(target: string, params: any = {}) {
   //   return this.startScan({
-  //     tool_id: PentestToolId.GRAPHQL_SCANNER,
+  //     tool_id: SecurityToolId.GRAPHQL_SCANNER,
   //     target_name: target,
   //     tool_params: params
   //   });
@@ -476,7 +476,7 @@ class PentestToolsService {
   // OSINT Tools
   // async startGoogleHacking(target: string, params: any = {}) {
   //   return this.startScan({
-  //     tool_id: PentestToolId.GOOGLE_HACKING,
+  //     tool_id: SecurityToolId.GOOGLE_HACKING,
   //     target_name: target,
   //     tool_params: params
   //   });
@@ -484,7 +484,7 @@ class PentestToolsService {
 
   // async startBreachCheck(target: string, params: any = {}) {
   //   return this.startScan({
-  //     tool_id: PentestToolId.BREACH_CHECK,
+  //     tool_id: SecurityToolId.BREACH_CHECK,
   //     target_name: target,
   //     tool_params: params
   //   });
@@ -509,4 +509,4 @@ class PentestToolsService {
   }
 }
 
-export default new PentestToolsService();
+export default new SecurityScannerService();

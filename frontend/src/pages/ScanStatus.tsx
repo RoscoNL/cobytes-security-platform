@@ -38,7 +38,7 @@ import {
 } from '@mui/icons-material';
 import { SecurityStatusIndicator, ScanProgressBar, ScanResultCard } from '../components/cobytes';
 import { cobytesColors } from '../theme/cobytes-theme';
-import { pentestToolsProxyService } from '../services/pentesttools-proxy.service';
+import { securityScannerProxyService } from '../services/security-scanner-proxy.service';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -85,13 +85,13 @@ const ScanStatus: React.FC = () => {
 
     try {
       setError(null);
-      const scanData = await pentestToolsProxyService.getScanStatus(parseInt(scanId));
+      const scanData = await securityScannerProxyService.getScanStatus(parseInt(scanId));
       setScan(scanData);
 
       if (scanData.status === 'finished' || scanData.status_name === 'finished') {
         setPolling(false);
         try {
-          const outputData = await pentestToolsProxyService.getScanOutput(parseInt(scanId));
+          const outputData = await securityScannerProxyService.getScanOutput(parseInt(scanId));
           setOutput(outputData);
         } catch (err) {
           console.error('Failed to get scan output:', err);
@@ -115,7 +115,7 @@ const ScanStatus: React.FC = () => {
     if (!scanId || !window.confirm('Are you sure you want to stop this scan?')) return;
 
     try {
-      await pentestToolsProxyService.stopScan(parseInt(scanId));
+      await securityScannerProxyService.stopScan(parseInt(scanId));
       await loadScanStatus();
     } catch (err: any) {
       setError(err.message || 'Failed to stop scan');
@@ -126,7 +126,7 @@ const ScanStatus: React.FC = () => {
     if (!scanId || !window.confirm('Are you sure you want to delete this scan?')) return;
 
     try {
-      await pentestToolsProxyService.deleteScan(parseInt(scanId));
+      await securityScannerProxyService.deleteScan(parseInt(scanId));
       navigate('/dashboard/scans');
     } catch (err: any) {
       setError(err.message || 'Failed to delete scan');

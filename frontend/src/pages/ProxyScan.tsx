@@ -25,7 +25,7 @@ import {
   ErrorOutline as ErrorIcon,
   Http as ProxyIcon,
 } from '@mui/icons-material';
-import { pentestToolsProxyService, ProxyPentestToolId } from '../services/pentesttools-proxy.service';
+import { securityScannerProxyService, ProxySecurityToolId } from '../services/security-scanner-proxy.service';
 
 interface ScanResult {
   status: any;
@@ -44,12 +44,12 @@ const ProxyScan: React.FC = () => {
   const [testResult, setTestResult] = useState<any>(null);
 
   const scanners = [
-    { value: 'wordpress', label: 'WordPress Scanner', toolId: ProxyPentestToolId.WORDPRESS_SCANNER },
-    { value: 'website', label: 'Website Scanner', toolId: ProxyPentestToolId.WEBSITE_SCANNER },
-    { value: 'drupal', label: 'Drupal Scanner', toolId: ProxyPentestToolId.DRUPAL_SCANNER },
-    { value: 'joomla', label: 'Joomla Scanner', toolId: ProxyPentestToolId.JOOMLA_SCANNER },
-    { value: 'ssl', label: 'SSL Scanner', toolId: ProxyPentestToolId.SSL_SCANNER },
-    { value: 'waf', label: 'WAF Detector', toolId: ProxyPentestToolId.WAF_DETECTOR },
+    { value: 'wordpress', label: 'WordPress Scanner', toolId: ProxySecurityToolId.WORDPRESS_SCANNER },
+    { value: 'website', label: 'Website Scanner', toolId: ProxySecurityToolId.WEBSITE_SCANNER },
+    { value: 'drupal', label: 'Drupal Scanner', toolId: ProxySecurityToolId.DRUPAL_SCANNER },
+    { value: 'joomla', label: 'Joomla Scanner', toolId: ProxySecurityToolId.JOOMLA_SCANNER },
+    { value: 'ssl', label: 'SSL Scanner', toolId: ProxySecurityToolId.SSL_SCANNER },
+    { value: 'waf', label: 'WAF Detector', toolId: ProxySecurityToolId.WAF_DETECTOR },
   ];
 
   const testProxy = async () => {
@@ -59,7 +59,7 @@ const ProxyScan: React.FC = () => {
 
     try {
       // Test the proxy by getting targets
-      const targets = await pentestToolsProxyService.getTargets();
+      const targets = await securityScannerProxyService.getTargets();
       setTestResult({
         success: true,
         message: 'Proxy is working!',
@@ -92,16 +92,16 @@ const ProxyScan: React.FC = () => {
 
       let scanResult;
       if (scanType === 'wordpress') {
-        scanResult = await pentestToolsProxyService.startWordPressScan(target, {
+        scanResult = await securityScannerProxyService.startWordPressScan(target, {
           scan_type: 'light',
           enumerate: ['users', 'plugins', 'themes']
         });
       } else if (scanType === 'website') {
-        scanResult = await pentestToolsProxyService.startWebsiteScan(target, {
+        scanResult = await securityScannerProxyService.startWebsiteScan(target, {
           scan_type: 'light'
         });
       } else {
-        scanResult = await pentestToolsProxyService.startScan({
+        scanResult = await securityScannerProxyService.startScan({
           tool_id: selectedScanner.toolId,
           target_name: target,
           tool_params: { scan_type: 'light' }
@@ -112,9 +112,9 @@ const ProxyScan: React.FC = () => {
       console.log('Scan started via proxy:', scanResult);
 
       // Poll for results
-      const result = await pentestToolsProxyService.waitForScanCompletion(
+      const result = await securityScannerProxyService.waitForScanCompletion(
         scanResult.scan_id,
-        (prog) => setProgress(prog)
+        (prog: number) => setProgress(prog)
       );
 
       setResult(result);
@@ -130,7 +130,7 @@ const ProxyScan: React.FC = () => {
   const stopScan = async () => {
     if (scanId) {
       try {
-        await pentestToolsProxyService.stopScan(scanId);
+        await securityScannerProxyService.stopScan(scanId);
         setScanning(false);
         setError('Scan stopped by user');
       } catch (err: any) {

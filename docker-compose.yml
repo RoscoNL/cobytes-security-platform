@@ -52,8 +52,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:-development-jwt-secret-change-in-production}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-development-refresh-secret-change-in-production}
       SESSION_SECRET: ${SESSION_SECRET:-development-session-secret-change-in-production}
-      PENTEST_TOOLS_API_KEY: ${PENTEST_TOOLS_API_KEY:-43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7}
-      PENTEST_TOOLS_API_URL: https://app.pentest-tools.com/api/v2
+      SECURITY_API_KEY: ${SECURITY_API_KEY:-43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7}
+      SECURITY_API_URL: https://app.pentest-tools.com/api/v2
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3002,http://localhost:3000}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3002}
       HOSTFACT_API_KEY: ${HOSTFACT_API_KEY:-6685741463b3d6791e31779df6a99a92}

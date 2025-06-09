@@ -26,11 +26,11 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
       
       if (isLogin) {
         // Login
-        const response = await axios.post(`${API_URL}/auth/login`, {
+        const response = await axios.post(`${API_URL}/api/auth/login`, {
           email: formData.email,
           password: formData.password,
         });
@@ -48,7 +48,7 @@ const Login: React.FC = () => {
         navigate(redirectTo);
       } else {
         // Register
-        const response = await axios.post(`${API_URL}/auth/register`, {
+        const response = await axios.post(`${API_URL}/api/auth/register`, {
           email: formData.email,
           password: formData.password,
           name: formData.name,
@@ -93,8 +93,8 @@ const Login: React.FC = () => {
   const fillTestCredentials = () => {
     setFormData({
       ...formData,
-      email: 'user@cobytes.com',
-      password: 'pass',
+      email: 'admin@cobytes.com',
+      password: 'admin123',
     });
   };
 

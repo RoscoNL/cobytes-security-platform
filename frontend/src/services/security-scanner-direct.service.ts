@@ -1,7 +1,7 @@
-// Direct CORS implementation for PentestTools API v2
-// According to https://pentest-tools.com/docs/api/v2, CORS is supported
+// Direct CORS implementation for Security Scanner API v2
+// CORS is supported for direct API access
 
-const API_KEY = process.env.REACT_APP_PENTEST_TOOLS_API_KEY || '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
+const API_KEY = process.env.REACT_APP_SCANNER_API_KEY || '43cIriuvQ9qEeFFaYbFDKpfzwLWuUA92tq7sOpzJ046a87e7';
 const API_URL = 'https://app.pentest-tools.com/api/v2';
 
 export interface Target {
@@ -28,7 +28,7 @@ export interface ScanOptions {
   tool_params?: Record<string, any>;
 }
 
-// Tool IDs from PentestTools API v2
+// Tool IDs for Security Scanner API v2
 export const ToolId = {
   SUBDOMAIN_FINDER: 20,
   EMAIL_FINDER: 25,
@@ -59,7 +59,7 @@ export const ToolId = {
   KUBERNETES_SCANNER: 540,
 };
 
-class PentestToolsDirectService {
+class SecurityScannerDirectService {
   private headers: HeadersInit;
 
   constructor() {
@@ -162,7 +162,7 @@ class PentestToolsDirectService {
       targetId = existingTarget.id;
     } else {
       // Create new target
-      const newTarget = await this.createTarget(target, `WordPress scan for ${target}`);
+      const newTarget = await this.createTarget(target, `Security scan for ${target}`);
       targetId = newTarget.id;
     }
 
@@ -215,5 +215,5 @@ class PentestToolsDirectService {
   }
 }
 
-export const pentestToolsDirectService = new PentestToolsDirectService();
-export default pentestToolsDirectService;
+export const securityScannerDirectService = new SecurityScannerDirectService();
+export default securityScannerDirectService;

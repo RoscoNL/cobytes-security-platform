@@ -20,7 +20,7 @@ import {
   CheckCircleOutline as CheckIcon,
   ErrorOutline as ErrorIcon,
 } from '@mui/icons-material';
-import { pentestToolsService, PentestToolId } from '../services/pentesttools.service';
+import securityScannerService, { SecurityToolId } from '../services/security-scanner.service';
 
 interface ScanResult {
   status: string;
@@ -43,7 +43,7 @@ const DirectScan: React.FC = () => {
 
     try {
       // Start WordPress scan directly via CORS
-      const { scan_id, target_id } = await pentestToolsService.startWordPressScan(target, {
+      const { scan_id, target_id } = await securityScannerService.startWordPressScan(target, {
         scan_type: 'deep',
         enumerate: ['users', 'plugins', 'themes', 'timthumbs', 'config_backups', 'db_exports', 'media'],
       });
@@ -52,7 +52,7 @@ const DirectScan: React.FC = () => {
       console.log('Scan started:', { scan_id, target_id });
 
       // Poll for results
-      const result = await pentestToolsService.waitForScanCompletion(scan_id, (prog) => {
+      const result = await securityScannerService.waitForScanCompletion(scan_id, (prog: number) => {
         setProgress(prog);
       });
 
@@ -69,7 +69,7 @@ const DirectScan: React.FC = () => {
   const stopScan = async () => {
     if (scanId) {
       try {
-        await pentestToolsService.stopScan(scanId);
+        await securityScannerService.stopScan(scanId);
         setScanning(false);
         setError('Scan stopped by user');
       } catch (err: any) {
@@ -202,7 +202,7 @@ const DirectScan: React.FC = () => {
           </Typography>
           <pre style={{ margin: 0, fontSize: '0.875rem' }}>
 {`API_URL: https://app.pentest-tools.com/api/v2
-Tool ID: ${PentestToolId.WORDPRESS_SCANNER} (WordPress Scanner)
+Tool ID: ${SecurityToolId.WORDPRESS_SCANNER} (WordPress Scanner)
 Method: Direct CORS request from browser`}
           </pre>
         </Paper>

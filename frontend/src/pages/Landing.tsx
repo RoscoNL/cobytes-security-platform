@@ -146,7 +146,7 @@ const Landing: React.FC = () => {
             Professional Security Scanning Platform
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200">
-            Powered by industry-leading PentestTools API for comprehensive security analysis
+            Powered by industry-leading security scanning technology for comprehensive security analysis
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
@@ -359,7 +359,7 @@ const Landing: React.FC = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4">Cobytes Security</h3>
               <p className="text-gray-400">
-                Professional security scanning powered by PentestTools API
+                Professional security scanning platform
               </p>
             </div>
             <div>

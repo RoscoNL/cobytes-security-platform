@@ -29,7 +29,7 @@ import {
   LockOutlined,
   SearchOutlined,
 } from '@mui/icons-material';
-import { pentestToolsProxyService, ProxyPentestToolId } from '../services/pentesttools-proxy.service';
+import { securityScannerProxyService, ProxySecurityToolId } from '../services/security-scanner-proxy.service';
 
 interface Scanner {
   id: number;
@@ -55,7 +55,7 @@ const AllScannersNew: React.FC = () => {
   const scanners: Scanner[] = [
     // Reconnaissance & Discovery
     {
-      id: ProxyPentestToolId.SUBDOMAIN_FINDER,
+      id: ProxySecurityToolId.SUBDOMAIN_FINDER,
       name: 'Subdomain Finder',
       category: 'Reconnaissance',
       description: 'Discover subdomains for a target domain',
@@ -64,7 +64,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'example.com'
     },
     {
-      id: ProxyPentestToolId.DOMAIN_FINDER,
+      id: ProxySecurityToolId.DOMAIN_FINDER,
       name: 'Domain Finder',
       category: 'Reconnaissance',
       description: 'Find related domains and assets',
@@ -73,7 +73,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'company name or domain'
     },
     {
-      id: ProxyPentestToolId.WEBSITE_RECON,
+      id: ProxySecurityToolId.WEBSITE_RECON,
       name: 'Website Recon',
       category: 'Reconnaissance',
       description: 'Comprehensive website reconnaissance',
@@ -84,7 +84,7 @@ const AllScannersNew: React.FC = () => {
     
     // Network Scanning
     {
-      id: ProxyPentestToolId.TCP_PORT_SCANNER,
+      id: ProxySecurityToolId.TCP_PORT_SCANNER,
       name: 'TCP Port Scanner',
       category: 'Network',
       description: 'Scan TCP ports on target systems',
@@ -93,7 +93,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: '192.168.1.1 or example.com'
     },
     {
-      id: ProxyPentestToolId.UDP_PORT_SCANNER,
+      id: ProxySecurityToolId.UDP_PORT_SCANNER,
       name: 'UDP Port Scanner',
       category: 'Network',
       description: 'Scan UDP ports on target systems',
@@ -102,7 +102,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: '192.168.1.1 or example.com'
     },
     {
-      id: ProxyPentestToolId.NETWORK_SCANNER,
+      id: ProxySecurityToolId.NETWORK_SCANNER,
       name: 'Network Scanner',
       category: 'Network',
       description: 'Comprehensive network vulnerability scanning',
@@ -113,7 +113,7 @@ const AllScannersNew: React.FC = () => {
     
     // Web Application Scanners
     {
-      id: ProxyPentestToolId.WEBSITE_SCANNER,
+      id: ProxySecurityToolId.WEBSITE_SCANNER,
       name: 'Website Scanner',
       category: 'Web Application',
       description: 'Scan websites for vulnerabilities',
@@ -122,7 +122,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'https://example.com'
     },
     {
-      id: ProxyPentestToolId.API_SCANNER,
+      id: ProxySecurityToolId.API_SCANNER,
       name: 'API Scanner',
       category: 'Web Application',
       description: 'Test API endpoints for security issues',
@@ -131,7 +131,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'https://api.example.com'
     },
     {
-      id: ProxyPentestToolId.URL_FUZZER,
+      id: ProxySecurityToolId.URL_FUZZER,
       name: 'URL Fuzzer',
       category: 'Web Application',
       description: 'Discover hidden files and directories',
@@ -142,7 +142,7 @@ const AllScannersNew: React.FC = () => {
     
     // CMS Scanners
     {
-      id: ProxyPentestToolId.WORDPRESS_SCANNER,
+      id: ProxySecurityToolId.WORDPRESS_SCANNER,
       name: 'WordPress Scanner',
       category: 'CMS',
       description: 'Scan WordPress sites for vulnerabilities',
@@ -151,7 +151,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'https://wordpress-site.com'
     },
     {
-      id: ProxyPentestToolId.DRUPAL_SCANNER,
+      id: ProxySecurityToolId.DRUPAL_SCANNER,
       name: 'Drupal Scanner',
       category: 'CMS',
       description: 'Scan Drupal sites for vulnerabilities',
@@ -160,7 +160,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'https://drupal-site.com'
     },
     {
-      id: ProxyPentestToolId.JOOMLA_SCANNER,
+      id: ProxySecurityToolId.JOOMLA_SCANNER,
       name: 'Joomla Scanner',
       category: 'CMS',
       description: 'Scan Joomla sites for vulnerabilities',
@@ -169,7 +169,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'https://joomla-site.com'
     },
     {
-      id: ProxyPentestToolId.SHARE_POINT_SCANNER,
+      id: ProxySecurityToolId.SHARE_POINT_SCANNER,
       name: 'SharePoint Scanner',
       category: 'CMS',
       description: 'Scan SharePoint sites for vulnerabilities',
@@ -180,7 +180,7 @@ const AllScannersNew: React.FC = () => {
     
     // Security & Cryptography
     {
-      id: ProxyPentestToolId.SSL_SCANNER,
+      id: ProxySecurityToolId.SSL_SCANNER,
       name: 'SSL/TLS Scanner',
       category: 'Cryptography',
       description: 'Analyze SSL/TLS configuration',
@@ -189,7 +189,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'example.com or https://example.com'
     },
     {
-      id: ProxyPentestToolId.WAF_DETECTOR,
+      id: ProxySecurityToolId.WAF_DETECTOR,
       name: 'WAF Detector',
       category: 'Security',
       description: 'Detect Web Application Firewalls',
@@ -198,7 +198,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'https://example.com'
     },
     {
-      id: ProxyPentestToolId.PASSWORD_AUDITOR,
+      id: ProxySecurityToolId.PASSWORD_AUDITOR,
       name: 'Password Auditor',
       category: 'Security',
       description: 'Audit password strength and policies',
@@ -209,7 +209,7 @@ const AllScannersNew: React.FC = () => {
     
     // Advanced Scanners
     {
-      id: ProxyPentestToolId.SNIPER,
+      id: ProxySecurityToolId.SNIPER,
       name: 'Sniper',
       category: 'Advanced',
       description: 'Advanced vulnerability scanner',
@@ -218,7 +218,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'https://example.com'
     },
     {
-      id: ProxyPentestToolId.CLOUD_SCANNER,
+      id: ProxySecurityToolId.CLOUD_SCANNER,
       name: 'Cloud Scanner',
       category: 'Cloud',
       description: 'Scan cloud infrastructure',
@@ -227,7 +227,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'cloud.example.com'
     },
     {
-      id: ProxyPentestToolId.KUBERNETES_SCANNER,
+      id: ProxySecurityToolId.KUBERNETES_SCANNER,
       name: 'Kubernetes Scanner',
       category: 'Cloud',
       description: 'Scan Kubernetes clusters',
@@ -236,7 +236,7 @@ const AllScannersNew: React.FC = () => {
       targetPlaceholder: 'k8s.example.com'
     },
     {
-      id: ProxyPentestToolId.FIND_VHOSTS,
+      id: ProxySecurityToolId.FIND_VHOSTS,
       name: 'Virtual Host Finder',
       category: 'Discovery',
       description: 'Find virtual hosts on a server',
@@ -268,13 +268,13 @@ const AllScannersNew: React.FC = () => {
       // Create or get target
       let targetId;
       try {
-        const targets = await pentestToolsProxyService.getTargets();
+        const targets = await securityScannerProxyService.getTargets();
         const existingTarget = targets.find(t => t.name === target);
         
         if (existingTarget) {
           targetId = existingTarget.id;
         } else {
-          const newTarget = await pentestToolsProxyService.createTarget(target);
+          const newTarget = await securityScannerProxyService.createTarget(target);
           targetId = newTarget.id;
         }
       } catch (err) {
@@ -291,7 +291,7 @@ const AllScannersNew: React.FC = () => {
       };
 
       console.log('Starting scan with options:', scanOptions);
-      const { scan_id } = await pentestToolsProxyService.startScan(scanOptions);
+      const { scan_id } = await securityScannerProxyService.startScan(scanOptions);
 
       // Save scan to localStorage for dashboard
       const scanRecord = {
@@ -305,12 +305,12 @@ const AllScannersNew: React.FC = () => {
       };
       
       // Save to localStorage
-      const existingScans = JSON.parse(localStorage.getItem('pentesttools_scans') || '[]');
-      localStorage.setItem('pentesttools_scans', JSON.stringify([scanRecord, ...existingScans].slice(0, 50)));
+      const existingScans = JSON.parse(localStorage.getItem('security_scans') || '[]');
+      localStorage.setItem('security_scans', JSON.stringify([scanRecord, ...existingScans].slice(0, 50)));
       
       // Also call the global method if available
-      if ((window as any).savePentestToolsScan) {
-        (window as any).savePentestToolsScan(scanRecord);
+      if ((window as any).saveSecurityScan) {
+        (window as any).saveSecurityScan(scanRecord);
       }
 
       // Show success message and option to view status
@@ -338,7 +338,7 @@ const AllScannersNew: React.FC = () => {
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          All PentestTools Scanners
+          All Security Scanners
         </Typography>
         
         <Alert severity="info" sx={{ mb: 3 }}>
@@ -455,15 +455,6 @@ const AllScannersNew: React.FC = () => {
                     onClick={() => navigate(`/scan-status/${scanResult.scan_id}`)}
                   >
                     View Scan Status
-                  </Button>
-                  <Button 
-                    variant="outlined" 
-                    component="a"
-                    href={`https://app.pentest-tools.com/scans/${scanResult.scan_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View in PentestTools
                   </Button>
                 </Box>
               </Box>

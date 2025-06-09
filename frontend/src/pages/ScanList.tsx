@@ -61,7 +61,7 @@ import {
 import { SecurityStatusIndicator, ScanProgressBar } from '../components/cobytes';
 import { cobytesColors } from '../theme/cobytes-theme';
 import scanService, { Scan } from '../services/scan.service';
-import { pentestToolsProxyService } from '../services/pentesttools-proxy.service';
+import { securityScannerProxyService } from '../services/security-scanner-proxy.service';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -110,9 +110,9 @@ const ScanList: React.FC = () => {
       // Try to load PentestTools scans for any scan with pentestToolsScanId
       const pentestScans = [];
       for (const scan of backendScans) {
-        if (scan.pentestToolsScanId) {
+        if (scan.securityScanId) {
           try {
-            const ptScan = await pentestToolsProxyService.getScanStatus(scan.pentestToolsScanId);
+            const ptScan = await securityScannerProxyService.getScanStatus(scan.securityScanId);
             pentestScans.push(ptScan);
           } catch (err) {
             console.error('Failed to load PentestTools scan:', err);
