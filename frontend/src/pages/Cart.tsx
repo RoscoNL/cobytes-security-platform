@@ -58,7 +58,7 @@ const Cart: React.FC = () => {
 
   const fetchCart = async () => {
     try {
-      const response = await api.get('/api/cart');
+      const response = await api.get('/cart');
       if (response.error) {
         console.error('Error fetching cart:', response.error);
       } else if (response.data) {
@@ -75,7 +75,7 @@ const Cart: React.FC = () => {
     if (!cart) return;
     
     try {
-      const response = await api.put(`/api/cart/${cart.id}/items/${itemId}`, {
+      const response = await api.put(`/cart/${cart.id}/items/${itemId}`, {
         quantity,
       });
       if (response.data) {
@@ -90,7 +90,7 @@ const Cart: React.FC = () => {
     if (!cart) return;
     
     try {
-      const response = await api.delete(`/api/cart/${cart.id}/items/${itemId}`);
+      const response = await api.delete(`/cart/${cart.id}/items/${itemId}`);
       if (response.data) {
         setCart(response.data);
       }
@@ -103,7 +103,7 @@ const Cart: React.FC = () => {
     if (!cart || !couponCode) return;
     
     try {
-      const response = await api.post(`/api/cart/${cart.id}/coupon`, {
+      const response = await api.post(`/cart/${cart.id}/coupon`, {
         couponCode,
       });
       if (response.data) {
@@ -118,7 +118,7 @@ const Cart: React.FC = () => {
     if (!cart) return;
     
     try {
-      const response = await api.delete(`/api/cart/${cart.id}/coupon`);
+      const response = await api.delete(`/cart/${cart.id}/coupon`);
       if (response.data) {
         setCart(response.data);
       }

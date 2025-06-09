@@ -13,6 +13,7 @@ import { notFoundHandler } from '@middleware/notFoundHandler';
 import { requestLogger } from '@middleware/requestLogger';
 import corsMiddleware from '@middleware/cors';
 import { sessionMiddleware } from '@middleware/session';
+import { conditionalBodyParser, conditionalUrlEncodedParser } from '@middleware/bodyParser';
 import { configureRoutes } from '@routes/index';
 import { logger } from '@utils/logger';
 import { initializeDatabase } from '@config/typeorm';
@@ -34,9 +35,9 @@ app.use(corsMiddleware);
 app.use(compression());
 app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Body parsing middleware - only parse bodies for POST/PUT/PATCH requests
+app.use(conditionalBodyParser);
+app.use(conditionalUrlEncodedParser);
 
 // Session middleware - temporarily disabled
 // app.use(sessionMiddleware);

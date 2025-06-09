@@ -57,7 +57,7 @@ const Products: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get('/api/products');
+      const response = await api.get('/products');
       if (response.error) {
         console.error('Error fetching products:', response.error);
       } else if (response.data) {
@@ -72,7 +72,7 @@ const Products: React.FC = () => {
 
   const fetchCart = async () => {
     try {
-      const response = await api.get('/api/cart');
+      const response = await api.get('/cart');
       if (response.error) {
         console.error('Error fetching cart:', response.error);
       } else if (response.data) {
@@ -85,7 +85,7 @@ const Products: React.FC = () => {
 
   const addToCart = async (productId: number) => {
     try {
-      const response = await api.post('/api/cart/add', {
+      const response = await api.post('/cart/add', {
         productId,
         quantity: 1,
       });

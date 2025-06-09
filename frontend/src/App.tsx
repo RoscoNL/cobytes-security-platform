@@ -4,6 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import cobytesTheme from './theme/cobytes-theme';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import ScanNew from './pages/ScanNew';
@@ -51,7 +52,7 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
             <Route path="/orders/:orderId/pay" element={<OrderPayment />} />
             <Route path="/orders/:orderId/success" element={<OrderSuccess />} />
             <Route path="/orders/:orderId/cancelled" element={<OrderCancelled />} />
@@ -63,22 +64,22 @@ function App() {
             <Route path="/scan-status/:scanId" element={<ScanStatusSimple />} />
             <Route path="/scan-demo" element={<ScanDemoWorking />} />
             <Route path="/security-dashboard" element={<SecurityDashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/dashboard/scans" element={<ScanList />} />
-            <Route path="/dashboard/scans/new" element={<ScanCreate />} />
-            <Route path="/dashboard/scans/:id" element={<ScanDetail />} />
-            <Route path="/dashboard/reports" element={<Reports />} />
-            <Route path="/dashboard/scanners" element={<AllScanners />} />
-            <Route path="/dashboard/how-to" element={<HowTo />} />
-            <Route path="/dashboard/api-status" element={<ApiStatus />} />
-            <Route path="/dashboard/direct-scan" element={<DirectScan />} />
-            <Route path="/dashboard/cors-test" element={<CorsTest />} />
-            <Route path="/dashboard/proxy-scan" element={<ProxyScan />} />
-            <Route path="/dashboard/cors-proxy-test" element={<CorsProxyTest />} />
-            <Route path="/dashboard/all-scanners" element={<AllScannersNew />} />
-            <Route path="/dashboard/integration" element={<IntegrationStatus />} />
-            <Route path="/dashboard/test-direct-cors" element={<TestDirectCors />} />
-            <Route path="/dashboard/direct-pentest" element={<DirectSecurityScanner />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/scans" element={<ProtectedRoute><ScanList /></ProtectedRoute>} />
+            <Route path="/dashboard/scans/new" element={<ProtectedRoute><ScanCreate /></ProtectedRoute>} />
+            <Route path="/dashboard/scans/:id" element={<ProtectedRoute><ScanDetail /></ProtectedRoute>} />
+            <Route path="/dashboard/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/dashboard/scanners" element={<ProtectedRoute><AllScanners /></ProtectedRoute>} />
+            <Route path="/dashboard/how-to" element={<ProtectedRoute><HowTo /></ProtectedRoute>} />
+            <Route path="/dashboard/api-status" element={<ProtectedRoute><ApiStatus /></ProtectedRoute>} />
+            <Route path="/dashboard/direct-scan" element={<ProtectedRoute><DirectScan /></ProtectedRoute>} />
+            <Route path="/dashboard/cors-test" element={<ProtectedRoute><CorsTest /></ProtectedRoute>} />
+            <Route path="/dashboard/proxy-scan" element={<ProtectedRoute><ProxyScan /></ProtectedRoute>} />
+            <Route path="/dashboard/cors-proxy-test" element={<ProtectedRoute><CorsProxyTest /></ProtectedRoute>} />
+            <Route path="/dashboard/all-scanners" element={<ProtectedRoute><AllScannersNew /></ProtectedRoute>} />
+            <Route path="/dashboard/integration" element={<ProtectedRoute><IntegrationStatus /></ProtectedRoute>} />
+            <Route path="/dashboard/test-direct-cors" element={<ProtectedRoute><TestDirectCors /></ProtectedRoute>} />
+            <Route path="/dashboard/direct-pentest" element={<ProtectedRoute><DirectSecurityScanner /></ProtectedRoute>} />
           </Route>
         </Routes>
       </Router>

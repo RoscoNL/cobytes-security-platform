@@ -79,7 +79,7 @@ const Orders: React.FC = () => {
 
   const loadOrders = async () => {
     try {
-      const response = await apiClient.get('/api/orders');
+      const response = await apiClient.get('/orders');
       if (response.data?.success) {
         setOrders(response.data.data);
       }
@@ -97,7 +97,7 @@ const Orders: React.FC = () => {
 
   const handleDownloadInvoice = async (orderId: number) => {
     try {
-      const response = await fetch(`${apiClient.getBaseURL()}/api/orders/${orderId}/invoice`, {
+      const response = await fetch(`${apiClient.getBaseURL()}/orders/${orderId}/invoice`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },

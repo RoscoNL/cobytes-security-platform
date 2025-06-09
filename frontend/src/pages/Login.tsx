@@ -30,7 +30,7 @@ const Login: React.FC = () => {
       
       if (isLogin) {
         // Login
-        const response = await axios.post(`${API_URL}/api/auth/login`, {
+        const response = await axios.post(`${API_URL}/auth/login`, {
           email: formData.email,
           password: formData.password,
         });
@@ -48,7 +48,7 @@ const Login: React.FC = () => {
         navigate(redirectTo);
       } else {
         // Register
-        const response = await axios.post(`${API_URL}/api/auth/register`, {
+        const response = await axios.post(`${API_URL}/auth/register`, {
           email: formData.email,
           password: formData.password,
           name: formData.name,
