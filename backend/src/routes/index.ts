@@ -48,7 +48,25 @@ export const configureRoutes = (app: Application): void => {
     });
   });
 
-  // API Routes
+  // API Routes - Support both with and without /api prefix for production
+  // Digital Ocean App Platform strips the /api prefix
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  if (isProduction) {
+    // Production routes without /api prefix (Digital Ocean strips it)
+    app.use('/auth', authRoutes);
+    app.use('/scans', scanRoutes);
+    app.use('/reports', reportRoutes);
+    app.use('/analytics', analyticsRoutes);
+    app.use('/system', systemRoutes);
+    app.use('/proxy', proxyRoutes);
+    app.use('/products', productRoutes);
+    app.use('/cart', cartRoutes);
+    app.use('/orders', orderRoutes);
+    app.use('/multisafepay', multisafepayRoutes);
+  }
+  
+  // Always support /api routes for local development and backwards compatibility
   app.use('/api/auth', authRoutes);
   app.use('/api/scans', scanRoutes);
   app.use('/api/reports', reportRoutes);
@@ -64,6 +82,25 @@ export const configureRoutes = (app: Application): void => {
   // app.use('/api/admin', adminRoutes);
 
   // Temporary test routes
+  if (isProduction) {
+    app.get('/test', (req: Request, res: Response) => {
+      res.json({
+        message: 'API is working!',
+        requestId: req.requestId,
+        timestamp: new Date().toISOString(),
+      });
+    });
+
+    app.post('/echo', (req: Request, res: Response) => {
+      res.json({
+        message: 'Echo endpoint',
+        body: req.body,
+        headers: req.headers,
+        query: req.query,
+      });
+    });
+  }
+  
   app.get('/api/test', (req: Request, res: Response) => {
     res.json({
       message: 'API is working!',
